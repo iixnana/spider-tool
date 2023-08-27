@@ -1,8 +1,15 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import {Link, Route, Routes} from "react-router-dom";
 
 const App: React.FC = () => {
+    useEffect(() => {
+        fetch('/api/users')
+            .then(response => response.json())
+            .then(json => console.log(json))
+    }, []);
+
     return (
         <div>
             <nav className="navbar navbar-expand navbar-dark bg-dark">
@@ -22,7 +29,6 @@ const App: React.FC = () => {
                     </li>
                 </div>
             </nav>
-            <p>Test</p>
 
             <div className="container mt-3">
                 <Routes>
