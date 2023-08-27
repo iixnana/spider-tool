@@ -1,26 +1,44 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Link, Route, Routes } from 'react-router-dom';
+import { UsersList } from './components/UsersList';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { Home } from './components/Home';
 
-function App() {
+const queryClient = new QueryClient();
+
+const App: React.FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
+    <div>
+      <nav className="navbar navbar-expand navbar-dark bg-dark">
+        <a href="/" className="navbar-brand">
+          Home
         </a>
-      </header>
+        <div className="navbar-nav mr-auto">
+          <li className="nav-item">
+            <Link to={'/users'} className="nav-link">
+              Users
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link to={'/etc'} className="nav-link">
+              Etc
+            </Link>
+          </li>
+        </div>
+      </nav>
+
+      <div className="container mt-3">
+        <QueryClientProvider client={queryClient}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/users" element={<UsersList />} />
+          </Routes>
+        </QueryClientProvider>
+      </div>
     </div>
   );
-}
+};
 
 export default App;
