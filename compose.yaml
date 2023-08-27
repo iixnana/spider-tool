@@ -15,7 +15,7 @@ services:
     image: "routes:0.0.1"
     container_name: routes
     ports:
-      - "8080:8080"
+      - "8090:8090"
     environment:
       - SPRING.PROFILES.ACTIVE=default
   front-end:
