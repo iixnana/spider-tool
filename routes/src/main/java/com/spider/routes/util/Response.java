@@ -1,10 +1,10 @@
 package com.spider.routes.util;
 
-public class FileUploadResponse {
+public class Response {
 
     private String message;
 
-    public FileUploadResponse(String message) {
+    public Response(String message) {
         this.message = message;
     }
 

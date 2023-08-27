@@ -1,16 +1,16 @@
 package com.spider.routes.controller;
 
-import com.spider.routes.util.FileUploadResponse;
-import com.spider.routes.util.FileUtil;
+import com.spider.routes.exception.StorageFileNotFoundException;
+import com.spider.routes.service.StorageService;
+import com.spider.routes.util.Response;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,44 +19,48 @@ import java.util.List;
 @RequestMapping("/api/files")
 @CrossOrigin(origins = "http://localhost:3000")
 public class FileController {
-    @PostMapping("/upload")
-    public ResponseEntity<FileUploadResponse> uploadFiles(@RequestParam("files") MultipartFile[] files) {
-        try {
-            createDirIfNotExist();
 
+    private final StorageService storageService;
+
+    @Autowired
+    public FileController(StorageService storageService) {
+        this.storageService = storageService;
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<String[]> getListFiles() {
+        return ResponseEntity.status(HttpStatus.OK).body(storageService.loadAll().map(path -> path.getFileName().toString()).toArray(String[]::new));
+    }
+
+    @GetMapping("/{filename:.+}")
+    @ResponseBody
+    public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
+
+        Resource file = storageService.loadAsResource(filename);
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<Response> handleFilesUpload(@RequestParam("files") MultipartFile[] files) {
+        try {
             List<String> fileNames = new ArrayList<>();
 
-            // read and write the file to the local folder
-            Arrays.asList(files).stream().forEach(file -> {
-                byte[] bytes = new byte[0];
-                try {
-                    bytes = file.getBytes();
-                    Files.write(Paths.get(FileUtil.folderPath + file.getOriginalFilename()), bytes);
-                    fileNames.add(file.getOriginalFilename());
-                } catch (IOException ignored) {
-
-                }
+            Arrays.asList(files).forEach(file -> {
+                storageService.store(file);
+                fileNames.add(file.getOriginalFilename());
             });
 
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new FileUploadResponse("Files uploaded successfully: " + fileNames));
-
+                    .body(new Response("Files uploaded successfully: " + fileNames));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
-                    .body(new FileUploadResponse("Exception to upload files!"));
+                    .body(new Response("Exception occurred while uploading files"));
         }
     }
 
-    private void createDirIfNotExist() {
-        //create directory to save the files
-        File directory = new File(FileUtil.folderPath);
-        if (!directory.exists()) {
-            directory.mkdir();
-        }
-    }
-
-    @GetMapping("/files")
-    public ResponseEntity<String[]> getListFiles() {
-        return ResponseEntity.status(HttpStatus.OK).body(new File(FileUtil.folderPath).list());
+    @ExceptionHandler(StorageFileNotFoundException.class)
+    public ResponseEntity<?> handleStorageFileNotFound(StorageFileNotFoundException exc) {
+        return ResponseEntity.notFound().build();
     }
 }
