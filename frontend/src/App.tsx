@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link, Route, Routes } from 'react-router-dom';
 import { UsersList } from './components/UsersList';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { Home } from './components/Home';
 
 const queryClient = new QueryClient();
 
@@ -31,7 +32,7 @@ const App: React.FC = () => {
       <div className="container mt-3">
         <QueryClientProvider client={queryClient}>
           <Routes>
-            <Route path="/" />
+            <Route path="/" element={<Home />} />
             <Route path="/users" element={<UsersList />} />
           </Routes>
         </QueryClientProvider>

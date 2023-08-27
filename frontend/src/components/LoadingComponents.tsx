@@ -1,6 +1,6 @@
-import { FC } from 'react';
+import React from 'react';
 
-export const LoadingPage: FC = () => {
+export const LoadingPage: React.FC = () => {
   return (
     <div className="d-flex justify-content-center">
       <div className="spinner-border" role="status">
@@ -12,7 +12,7 @@ export const LoadingPage: FC = () => {
   );
 };
 
-export const LoadingButton: FC = () => {
+export const LoadingButton: React.FC = () => {
   return (
     <button className="btn btn-primary" type="button" disabled>
       <span
