@@ -5,6 +5,7 @@ import { Link, Route, Routes } from 'react-router-dom';
 import { UsersList } from './components/UsersList';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Home } from './components/Home';
+import Login from './components/Login';
 
 const queryClient = new QueryClient();
 
@@ -22,8 +23,8 @@ const App: React.FC = () => {
             </Link>
           </li>
           <li className="nav-item">
-            <Link to={'/etc'} className="nav-link">
-              Etc
+            <Link to={'/login'} className="nav-link">
+              Login
             </Link>
           </li>
         </div>
@@ -34,6 +35,7 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/users" element={<UsersList />} />
+            <Route path="/login" element={<Login />} />
           </Routes>
         </QueryClientProvider>
       </div>
