@@ -5,7 +5,6 @@ import { Link, Route, Routes } from 'react-router-dom';
 import { UsersList } from './components/UsersList';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Home } from './components/Home';
-import Login from './components/Login';
 
 const queryClient = new QueryClient();
 
@@ -35,7 +34,7 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/users" element={<UsersList />} />
-            <Route path="/login" element={<Login />} />
+            <Route path="/login" />
           </Routes>
         </QueryClientProvider>
       </div>
