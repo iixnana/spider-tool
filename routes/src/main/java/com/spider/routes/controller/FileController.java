@@ -1,5 +1,6 @@
 package com.spider.routes.controller;
 
+import com.spider.routes.dto.UserDto;
 import com.spider.routes.exception.StorageFileNotFoundException;
 import com.spider.routes.service.files.StorageService;
 import com.spider.routes.util.Response;
@@ -8,6 +9,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,12 +44,12 @@ public class FileController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<Response> handleFilesUpload(@RequestParam("files") MultipartFile[] files) {
+    public ResponseEntity<Response> handleFilesUpload(@RequestParam("files") MultipartFile[] files, @AuthenticationPrincipal UserDto userDto) {
         try {
             List<String> fileNames = new ArrayList<>();
 
             Arrays.asList(files).forEach(file -> {
-                storageService.store(file);
+                storageService.store(file, userDto);
                 fileNames.add(file.getOriginalFilename());
             });
 

@@ -4,11 +4,13 @@ import com.spider.routes.model.SpiderFile;
 import com.spider.routes.model.User;
 import com.spider.routes.repository.SpiderFileRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Service
 public class SpiderFileService {
     private final SpiderFileRepository spiderFileRepository;
 
@@ -24,16 +26,15 @@ public class SpiderFileService {
         return spiderFileRepository.findByAuthor(user);
     }
 
-    public SpiderFile getSpiderFileByUuid(UUID uuid) {
+    public SpiderFile getSpiderFileById(UUID uuid) {
         return spiderFileRepository.findById(uuid).orElse(null);
     }
 
-    public SpiderFile createSpiderFile(User author, String originalFilename) {
+    public SpiderFile createSpiderFile(User author) {
         SpiderFile spiderFile = new SpiderFile();
         UUID uuid = UUID.randomUUID();
         spiderFile.setId(uuid);
         spiderFile.setAuthor(author);
-        spiderFile.setOriginalFilename(originalFilename);
         spiderFile.setProblemFilename(String.format("%s_problem", uuid));
         return spiderFileRepository.save(spiderFile);
     }

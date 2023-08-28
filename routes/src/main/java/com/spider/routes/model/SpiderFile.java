@@ -1,17 +1,16 @@
 package com.spider.routes.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
 @Table(name = "spider_files")
 public class SpiderFile {
     @Id
-    private UUID id = UUID.randomUUID();
-
-    @Column(name = "original_filename", nullable = false)
-    private String originalFilename;
+    private UUID id;
 
     @Column(name = "problem_filename", nullable = false)
     private String problemFilename;
@@ -23,12 +22,14 @@ public class SpiderFile {
     @JoinColumn(name = "author", nullable = false)
     private User author;
 
+    @CreationTimestamp
+    private Instant createdOn;
+
 
     public SpiderFile() {
     }
 
     public SpiderFile(String originalFilename, String problemFilename, String solutionFilename, User author) {
-        this.originalFilename = originalFilename;
         this.problemFilename = problemFilename;
         this.solutionFilename = solutionFilename;
         this.author = author;
@@ -40,14 +41,6 @@ public class SpiderFile {
 
     public void setId(UUID id) {
         this.id = id;
-    }
-
-    public String getOriginalFilename() {
-        return originalFilename;
-    }
-
-    public void setOriginalFilename(String originalFilename) {
-        this.originalFilename = originalFilename;
     }
 
     public String getProblemFilename() {
@@ -72,5 +65,13 @@ public class SpiderFile {
 
     public void setAuthor(User author) {
         this.author = author;
+    }
+
+    public Instant getCreatedOn() {
+        return createdOn;
+    }
+
+    public void setCreatedOn(Instant createdOn) {
+        this.createdOn = createdOn;
     }
 }

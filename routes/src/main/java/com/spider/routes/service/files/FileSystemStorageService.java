@@ -1,7 +1,10 @@
 package com.spider.routes.service.files;
 
+import com.spider.routes.dto.UserDto;
 import com.spider.routes.exception.StorageException;
 import com.spider.routes.exception.StorageFileNotFoundException;
+import com.spider.routes.model.SpiderFile;
+import com.spider.routes.service.UserService;
 import com.spider.routes.util.StorageProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -13,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,25 +29,72 @@ public class FileSystemStorageService implements StorageService {
 
     private final SpiderFileService spiderFileService;
 
+    private final UserService userService;
+
     @Autowired
-    public FileSystemStorageService(StorageProperties properties, SpiderFileService spiderFileService) {
+    public FileSystemStorageService(StorageProperties properties, SpiderFileService spiderFileService, UserService userService) {
         this.rootLocation = Paths.get(properties.getLocation());
         this.spiderFileService = spiderFileService;
+        this.userService = userService;
+    }
+
+    private static boolean validateContent(String content) {
+        String[] lines = content.split("\n");
+
+        // Check if the first line matches the pattern
+        String expectedFirstLine = "latitude,longitude";
+        if (!lines[0].trim().equals(expectedFirstLine)) {
+            return false;
+        }
+
+        // Check if each subsequent line has the correct format
+        for (int i = 1; i < lines.length; i++) {
+            String line = lines[i].trim();
+            String[] coordinates = line.split(",");
+
+            if (coordinates.length != 2) {
+                return false; // Each line should have exactly two coordinates
+            }
+
+            try {
+                double latitude = Double.parseDouble(coordinates[0]);
+                double longitude = Double.parseDouble(coordinates[1]);
+            } catch (NumberFormatException e) {
+                return false; // Unable to parse coordinates as numbers
+            }
+        }
+
+        return true;
     }
 
     @Override
-    public void store(MultipartFile file) {
+    public void store(MultipartFile file, UserDto userDto) {
         try {
+            // Do not store empty files
             if (file.isEmpty()) {
                 throw new StorageException("Failed to store empty file.");
             }
 
+            // Validate file structure
+            String content = new String(file.getBytes(), StandardCharsets.UTF_8);
+            boolean isValid = validateContent(content);
+
+            if (!isValid) {
+                throw new StorageException("The file structure is invalid.");
+            }
+
+            SpiderFile s = spiderFileService.createSpiderFile(userService.getUserById(userDto.getId()));
+            System.out.println(s.getAuthor());
+            System.out.println(s.getProblemFilename());
+            System.out.println(s.getCreatedOn());
+
+            SpiderFile spiderFile = spiderFileService.getSpiderFileById(s.getId());
 
             Path destinationFile = this.rootLocation.resolve(
-                            Paths.get(file.getOriginalFilename()))
-                    .normalize().toAbsolutePath();
+                    Paths.get(spiderFile.getProblemFilename())
+            ).normalize().toAbsolutePath();
             if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
-                // This is a security check
+                // Security check
                 throw new StorageException(
                         "Cannot store file outside current directory.");
             }

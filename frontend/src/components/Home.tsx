@@ -10,12 +10,12 @@ export const Home: React.FC = () => {
         if (!AuthService.isAuthTokenValid()) {
             navigate('/login');
         } else {
-            fetch('/api/spider', {
+            fetch('/api/spider-files', {
                 headers: { Authorization: AuthService.getAuthHeader() }
             })
                 .then((response) => response.json())
                 .then((data) => {
-                    console.log(data['sessionIds']);
+                    console.log(data);
                 });
         }
     });

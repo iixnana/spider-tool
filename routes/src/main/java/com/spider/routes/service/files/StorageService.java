@@ -1,5 +1,6 @@
 package com.spider.routes.service.files;
 
+import com.spider.routes.dto.UserDto;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,7 +10,7 @@ import java.util.stream.Stream;
 public interface StorageService {
     void init();
 
-    void store(MultipartFile file);
+    void store(MultipartFile file, UserDto userDto);
 
     Stream<Path> loadAll();
 
