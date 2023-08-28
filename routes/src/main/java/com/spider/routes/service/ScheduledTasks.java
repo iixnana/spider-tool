@@ -3,7 +3,7 @@ package com.spider.routes.service;
 import com.google.gson.Gson;
 import com.spider.routes.exception.InvalidFormatException;
 import com.spider.routes.model.SpiderData;
-import com.spider.routes.util.SessionCreationResponse;
+import com.spider.routes.util.SpiderSessionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -45,7 +45,7 @@ public class ScheduledTasks {
                 HttpResponse<String> response = spiderService.createSession(row.getProblemFilename());
 
                 if (response.statusCode() == HttpStatus.CREATED.value()) {
-                    SessionCreationResponse parsedResponseBody = gson.fromJson(response.body(), SessionCreationResponse.class);
+                    SpiderSessionResponse parsedResponseBody = gson.fromJson(response.body(), SpiderSessionResponse.class);
                     spiderSessionService.createSpiderSession(parsedResponseBody);
                     successfulCounter += 1;
                 } else {

@@ -30,13 +30,19 @@ public class SpiderSession {
     @Column(name = "best_solution_value")
     private int bestSolutionValue;
 
+    @Column(name = "error_during_setup")
+    private String errorDuringSetup;
+
+    @Column(name = "internal_optimizer_error")
+    private String internalOptimizerError;
+
     @OneToOne(mappedBy = "session")
     private SpiderData spiderData;
 
     public SpiderSession() {
     }
 
-    public SpiderSession(String sessionId, boolean isReady, String setupProgress, boolean optimizationIsRunning, int iterationCount, String optimizationTime, int bestSolutionValue) {
+    public SpiderSession(String sessionId, boolean isReady, String setupProgress, boolean optimizationIsRunning, int iterationCount, String optimizationTime, int bestSolutionValue, String errorDuringSetup, String internalOptimizerError) {
         this.sessionId = sessionId;
         this.isReady = isReady;
         this.setupProgress = setupProgress;
@@ -44,6 +50,8 @@ public class SpiderSession {
         this.iterationCount = iterationCount;
         this.optimizationTime = optimizationTime;
         this.bestSolutionValue = bestSolutionValue;
+        this.errorDuringSetup = errorDuringSetup;
+        this.internalOptimizerError = internalOptimizerError;
     }
 
     public Long getId() {
@@ -108,5 +116,21 @@ public class SpiderSession {
 
     public void setBestSolutionValue(int bestSolutionValue) {
         this.bestSolutionValue = bestSolutionValue;
+    }
+
+    public String getErrorDuringSetup() {
+        return errorDuringSetup;
+    }
+
+    public void setErrorDuringSetup(String errorDuringSetup) {
+        this.errorDuringSetup = errorDuringSetup;
+    }
+
+    public String getInternalOptimizerError() {
+        return internalOptimizerError;
+    }
+
+    public void setInternalOptimizerError(String internalOptimizerError) {
+        this.internalOptimizerError = internalOptimizerError;
     }
 }

@@ -1,15 +1,17 @@
 package com.spider.routes.util;
 
-public class SessionCreationResponse {
+public class SpiderSessionResponse {
     private String id;
     private boolean isReady;
     private String setupProgress;
+    private String errorDuringSetup;
     private boolean optimizationIsRunning;
     private int iterationCount;
     private String optimizationTime;
     private int bestSolutionValue;
+    private String internalOptimizerError;
 
-    public SessionCreationResponse() {
+    public SpiderSessionResponse() {
     }
 
     public String getId() {
@@ -66,5 +68,21 @@ public class SessionCreationResponse {
 
     public void setBestSolutionValue(int bestSolutionValue) {
         this.bestSolutionValue = bestSolutionValue;
+    }
+
+    public String getErrorDuringSetup() {
+        return errorDuringSetup;
+    }
+
+    public void setErrorDuringSetup(String errorDuringSetup) {
+        this.errorDuringSetup = errorDuringSetup;
+    }
+
+    public String getInternalOptimizerError() {
+        return internalOptimizerError;
+    }
+
+    public void setInternalOptimizerError(String internalOptimizerError) {
+        this.internalOptimizerError = internalOptimizerError;
     }
 }
