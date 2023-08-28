@@ -43,22 +43,29 @@ export const SpiderFileTable: React.FC = () => {
         <div>
             <UploadFile />
             <table>
-                <tr>
-                    <th>ID</th>
-                    <th>Created On</th>
-                    <th>Problem Filename</th>
-                    <th>Solution Filename</th>
-                    <th>Author</th>
-                </tr>
-                {data.map((row) => (
+                <thead>
                     <tr>
-                        <td>{row.id}</td>
-                        <td>{row.createdOn}</td>
-                        <td>{row.problemFilename}</td>
-                        <td>{row.solutionFilename}</td>
-                        <td>{row.author.username}</td>
+                        <th>ID</th>
+                        <th>Created On</th>
+                        <th>Problem Filename</th>
+                        <th>Solution Filename</th>
+                        <th>Author</th>
                     </tr>
-                ))}
+                </thead>
+
+                <tbody>
+                    {data.map((row, i) => (
+                        <tr key={i}>
+                            <td>{row.id}</td>
+                            <td>{row.createdOn}</td>
+                            <td>{row.problemFilename}</td>
+                            <td>{row.solutionFilename}</td>
+                            <td>
+                                {row.author.firstName} {row.author.lastName}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
             </table>
         </div>
     );

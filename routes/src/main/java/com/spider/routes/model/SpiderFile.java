@@ -2,6 +2,7 @@ package com.spider.routes.model;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -25,14 +26,18 @@ public class SpiderFile {
     @CreationTimestamp
     private Instant createdOn;
 
+    @UpdateTimestamp
+    private Instant lastUpdatedOn;
+
 
     public SpiderFile() {
     }
 
-    public SpiderFile(String originalFilename, String problemFilename, String solutionFilename, User author) {
+    public SpiderFile(String originalFilename, String problemFilename, String solutionFilename, User author, Instant lastUpdatedOn) {
         this.problemFilename = problemFilename;
         this.solutionFilename = solutionFilename;
         this.author = author;
+        this.lastUpdatedOn = lastUpdatedOn;
     }
 
     public UUID getId() {
@@ -73,5 +78,13 @@ public class SpiderFile {
 
     public void setCreatedOn(Instant createdOn) {
         this.createdOn = createdOn;
+    }
+
+    public Instant getLastUpdatedOn() {
+        return lastUpdatedOn;
+    }
+
+    public void setLastUpdatedOn(Instant lastUpdatedOn) {
+        this.lastUpdatedOn = lastUpdatedOn;
     }
 }

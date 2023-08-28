@@ -2,8 +2,8 @@ package com.spider.routes.controller;
 
 import com.spider.routes.dto.UserDto;
 import com.spider.routes.model.SpiderFile;
+import com.spider.routes.service.SpiderFileService;
 import com.spider.routes.service.UserService;
-import com.spider.routes.service.files.SpiderFileService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -28,6 +28,9 @@ public class SpiderFileController {
     @GetMapping
     public ResponseEntity<List<SpiderFile>> getAllFilesRecordsForUser(@AuthenticationPrincipal UserDto userDto) {
         List<SpiderFile> spiderFiles = spiderFileService.getSpiderFilesByAuthor(userService.getUserById(userDto.getId()));
+        for (SpiderFile spider : spiderFiles) {
+            System.out.println(spider.getCreatedOn());
+        }
         return ResponseEntity.ok(spiderFiles);
     }
 }

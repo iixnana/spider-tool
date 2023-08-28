@@ -1,4 +1,4 @@
-package com.spider.routes.service.files;
+package com.spider.routes.service;
 
 import com.spider.routes.model.SpiderFile;
 import com.spider.routes.model.User;
@@ -51,7 +51,7 @@ public class SpiderFileService {
             spiderFile.setSolutionFilename(String.format("%s_solution", uuid));
             return spiderFileRepository.save(spiderFile);
         } else {
-            throw new EntityNotFoundException("Spider problem not found with id: " + uuid);
+            throw new EntityNotFoundException("SpiderFile not found with id: " + uuid);
         }
     }
 

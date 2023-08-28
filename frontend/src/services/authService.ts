@@ -1,5 +1,6 @@
 import { Cookies } from 'react-cookie';
 import jwt_decode from 'jwt-decode';
+import { IUserDto } from '../types/User';
 
 class AuthService {
     private cookies = new Cookies();
@@ -7,13 +8,7 @@ class AuthService {
     user = 'user';
     expire_after = 3600; // Will expire after 1hr
 
-    setAuthCookies(user: {
-        id: number;
-        firstname: string;
-        lastname: string;
-        login: string;
-        token: string;
-    }) {
+    setAuthCookies(user: IUserDto) {
         this.cookies.set(this.token, user.token, {
             maxAge: this.expire_after
         });
@@ -37,17 +32,10 @@ class AuthService {
     isAuthTokenValid() {
         if (!this.getAuthToken()) return false;
         const decodedToken = jwt_decode(this.getAuthToken());
-        console.log('Decoded Token', decodedToken);
         const currentDate = new Date();
 
         // @ts-ignore
-        if (decodedToken.exp * this.expire_after < currentDate.getTime()) {
-            console.log('Token expired.');
-            return false;
-        } else {
-            console.log('Valid token');
-            return true;
-        }
+        return decodedToken.exp * this.expire_after >= currentDate.getTime();
     }
 
     removeAuthCookies() {

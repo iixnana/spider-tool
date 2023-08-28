@@ -8,6 +8,7 @@ import com.spider.routes.exception.InvalidFormatException;
 import com.spider.routes.exception.StorageException;
 import com.spider.routes.exception.StorageFileNotFoundException;
 import com.spider.routes.model.SpiderFile;
+import com.spider.routes.service.SpiderFileService;
 import com.spider.routes.service.UserService;
 import com.spider.routes.util.StorageProperties;
 import org.springframework.beans.factory.annotation.Autowired;
