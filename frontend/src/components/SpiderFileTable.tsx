@@ -39,6 +39,9 @@ export const SpiderFileTable: React.FC = () => {
 
     if (error || !data) return <LoadingPage />;
 
+    data.map((row, i) => console.log(row.createdOn));
+
+    // TODO: Fix createdOn format
     return (
         <div>
             <UploadFile />
@@ -46,7 +49,6 @@ export const SpiderFileTable: React.FC = () => {
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Created On</th>
                         <th>Problem Filename</th>
                         <th>Solution Filename</th>
                         <th>Author</th>
@@ -57,7 +59,6 @@ export const SpiderFileTable: React.FC = () => {
                     {data.map((row, i) => (
                         <tr key={i}>
                             <td>{row.id}</td>
-                            <td>{row.createdOn}</td>
                             <td>{row.problemFilename}</td>
                             <td>{row.solutionFilename}</td>
                             <td>
