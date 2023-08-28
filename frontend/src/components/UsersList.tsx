@@ -2,12 +2,15 @@ import React from 'react';
 import { useQuery } from 'react-query';
 import { LoadingPage } from './LoadingComponents';
 import IUserData from '../types/User';
+import AuthService from '../services/authService';
 
 export const UsersList: React.FC = () => {
     const { error, data } = useQuery({
         queryKey: 'usersList',
         queryFn: () =>
-            fetch('/api/users')
+            fetch('/api/users', {
+                headers: { Authorization: AuthService.getAuthHeader() }
+            })
                 .then((response) => response.json())
                 .then((data) => {
                     if (

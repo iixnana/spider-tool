@@ -9,6 +9,14 @@ export const Home: React.FC = () => {
     useEffect(() => {
         if (!AuthService.isAuthTokenValid()) {
             navigate('/login');
+        } else {
+            fetch('/api/spider', {
+                headers: { Authorization: AuthService.getAuthHeader() }
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log(data['sessionIds']);
+                });
         }
     });
 
