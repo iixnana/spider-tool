@@ -30,14 +30,14 @@ public class SpiderService {
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
-    public HttpResponse<String> checkSession(String sessionId) throws IOException, InterruptedException {
+    public HttpResponse<String> getSession(String sessionId) throws IOException, InterruptedException {
         String url = spiderBaseUrl + "/api/v1/sessions/" + sessionId;
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
-    public HttpResponse<String> checkSessionWarnings(String sessionId) throws IOException, InterruptedException {
+    public HttpResponse<String> getSessionWarnings(String sessionId) throws IOException, InterruptedException {
         String url = spiderBaseUrl + "/api/v1/sessions/" + sessionId + "/warnings";
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).build();

@@ -1,11 +1,14 @@
 package com.spider.routes.service;
 
+import com.spider.routes.dto.SpiderSessionDto;
 import com.spider.routes.model.SpiderSession;
 import com.spider.routes.repository.SpiderSessionRepository;
-import com.spider.routes.util.SpiderSessionResponse;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SpiderSessionService {
@@ -23,8 +26,56 @@ public class SpiderSessionService {
         return spiderSessionRepository.findById(id).orElse(null);
     }
 
-    public SpiderSession createSpiderSession(SpiderSessionResponse session) {
-        SpiderSession spiderSession = new SpiderSession(session.getId(), session.isReady(), session.getSetupProgress(), session.isOptimizationIsRunning(), session.getIterationCount(), session.getOptimizationTime(), session.getBestSolutionValue(), session.getErrorDuringSetup(), session.getInternalOptimizerError());
+    public List<SpiderSession> getSpiderSessionsWithoutOptimization() {
+        return spiderSessionRepository.findByAndOptimizationIsRunningIsFalseAndIsReadyIsTrueAndIterationCountIs(0);
+    }
+
+    public List<SpiderSession> getSpiderSessionsWithRunningOptimization() {
+        return spiderSessionRepository.findByOptimizationIsRunningIsTrue();
+    }
+
+    public List<SpiderSession> getSpiderSessionsWithCompletedOptimization() {
+        return spiderSessionRepository.findByOptimizationIsRunningIsFalseAndBestSolutionValueIsNotNull();
+    }
+
+    public SpiderSession createSpiderSession(SpiderSessionDto session) {
+        SpiderSession spiderSession = new SpiderSession(
+                session.getId(),
+                session.isReady(),
+                session.getSetupProgress(),
+                session.isOptimizationIsRunning(),
+                session.getIterationCount(),
+                session.getOptimizationTime(),
+                session.getBestSolutionValue(),
+                session.getErrorDuringSetup(),
+                session.getInternalOptimizerError(),
+                new ArrayList<>()
+        );
         return spiderSessionRepository.save(spiderSession);
+    }
+
+    public SpiderSession updateSpiderSession(Long id, SpiderSessionDto session) {
+        Optional<SpiderSession> optionalSession = spiderSessionRepository.findById(id);
+        if (optionalSession.isPresent()) {
+            SpiderSession spiderSession = optionalSession.get();
+
+            //Save current solution to compare with for progress
+            List<Integer> previousSolutions = spiderSession.getSolutionValues();
+            previousSolutions.add(session.getBestSolutionValue());
+
+            spiderSession.setBestSolutionValue(session.getBestSolutionValue());
+            spiderSession.setErrorDuringSetup(session.getErrorDuringSetup());
+            spiderSession.setReady(session.isReady());
+            spiderSession.setInternalOptimizerError(session.getInternalOptimizerError());
+            spiderSession.setIterationCount(session.getIterationCount());
+            spiderSession.setOptimizationIsRunning(session.isOptimizationIsRunning());
+            spiderSession.setOptimizationTime(session.getOptimizationTime());
+            spiderSession.setSetupProgress(session.getSetupProgress());
+            spiderSession.setSolutionValues(previousSolutions);
+
+            return spiderSessionRepository.save(spiderSession);
+        } else {
+            throw new EntityNotFoundException("SpiderSession not found with id: " + id);
+        }
     }
 }

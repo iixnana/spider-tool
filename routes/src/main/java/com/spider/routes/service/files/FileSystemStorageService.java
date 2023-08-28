@@ -19,10 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -109,6 +106,20 @@ public class FileSystemStorageService implements StorageService {
                 Files.copy(inputStream, destinationFile,
                         StandardCopyOption.REPLACE_EXISTING);
             }
+        } catch (IOException e) {
+            throw new StorageException("Failed to store file.", e);
+        }
+    }
+
+    @Override
+    public void storeJsonAsFile(String filename, String json) {
+        String destinationFile = this.rootLocation.resolve(
+                Paths.get(filename)
+        ).normalize().toAbsolutePath().toString();
+
+        try (FileWriter writer = new FileWriter(destinationFile)) {
+            // Write the JSON string to the file
+            writer.write(json);
         } catch (IOException e) {
             throw new StorageException("Failed to store file.", e);
         }

@@ -2,6 +2,9 @@ package com.spider.routes.model;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
+
 @Entity
 @Table(name = "spider_session")
 public class SpiderSession {
@@ -36,13 +39,17 @@ public class SpiderSession {
     @Column(name = "internal_optimizer_error")
     private String internalOptimizerError;
 
+    @ElementCollection
+    @Column(name = "solution_values")
+    private List<Integer> solutionValues;
+
     @OneToOne(mappedBy = "session")
     private SpiderData spiderData;
 
     public SpiderSession() {
     }
 
-    public SpiderSession(String sessionId, boolean isReady, String setupProgress, boolean optimizationIsRunning, int iterationCount, String optimizationTime, int bestSolutionValue, String errorDuringSetup, String internalOptimizerError) {
+    public SpiderSession(String sessionId, boolean isReady, String setupProgress, boolean optimizationIsRunning, int iterationCount, String optimizationTime, int bestSolutionValue, String errorDuringSetup, String internalOptimizerError, List<Integer> solutionValues) {
         this.sessionId = sessionId;
         this.isReady = isReady;
         this.setupProgress = setupProgress;
@@ -52,6 +59,7 @@ public class SpiderSession {
         this.bestSolutionValue = bestSolutionValue;
         this.errorDuringSetup = errorDuringSetup;
         this.internalOptimizerError = internalOptimizerError;
+        this.solutionValues = solutionValues;
     }
 
     public Long getId() {
@@ -132,5 +140,21 @@ public class SpiderSession {
 
     public void setInternalOptimizerError(String internalOptimizerError) {
         this.internalOptimizerError = internalOptimizerError;
+    }
+
+    public List<Integer> getSolutionValues() {
+        return solutionValues;
+    }
+
+    public void setSolutionValues(List<Integer> solutionValues) {
+        this.solutionValues = solutionValues;
+    }
+
+    public SpiderData getSpiderData() {
+        return spiderData;
+    }
+
+    public void setSpiderData(SpiderData spiderData) {
+        this.spiderData = spiderData;
     }
 }

@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.net.http.HttpResponse;
+
+// TODO: Build API endpoints so Spider management could be accessed from frontend
 
 @RestController
 @RequestMapping("/api/spider")
@@ -21,7 +24,7 @@ public class SpiderController {
 
     @GetMapping
     public ResponseEntity<String> getServerStatus() throws IOException, InterruptedException {
-        String response = spiderService.checkServerStatus();
-        return ResponseEntity.ok(response);
+        HttpResponse<String> response = spiderService.checkServerStatus();
+        return ResponseEntity.ok(response.body());
     }
 }

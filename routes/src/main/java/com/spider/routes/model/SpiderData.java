@@ -1,5 +1,6 @@
 package com.spider.routes.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -23,6 +24,7 @@ public class SpiderData {
     @Column(name = "solution_filename")
     private String solutionFilename;
 
+    @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "session", referencedColumnName = "id")
     private SpiderSession session;
@@ -41,11 +43,10 @@ public class SpiderData {
     public SpiderData() {
     }
 
-    public SpiderData(UUID fileId, String problemFilename, String solutionFilename, SpiderSession session, User author, Instant createdOn, Instant lastUpdatedOn) {
+    public SpiderData(UUID fileId, String problemFilename, String solutionFilename, User author, Instant createdOn, Instant lastUpdatedOn) {
         this.fileId = fileId;
         this.problemFilename = problemFilename;
         this.solutionFilename = solutionFilename;
-        this.session = session;
         this.author = author;
         this.createdOn = createdOn;
         this.lastUpdatedOn = lastUpdatedOn;
@@ -107,11 +108,4 @@ public class SpiderData {
         this.lastUpdatedOn = lastUpdatedOn;
     }
 
-    public SpiderSession getSession() {
-        return session;
-    }
-
-    public void setSession(SpiderSession session) {
-        this.session = session;
-    }
 }

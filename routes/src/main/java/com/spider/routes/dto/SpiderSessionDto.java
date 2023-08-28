@@ -1,6 +1,6 @@
-package com.spider.routes.util;
+package com.spider.routes.dto;
 
-public class SpiderSessionResponse {
+public class SpiderSessionDto {
     private String id;
     private boolean isReady;
     private String setupProgress;
@@ -11,7 +11,7 @@ public class SpiderSessionResponse {
     private int bestSolutionValue;
     private String internalOptimizerError;
 
-    public SpiderSessionResponse() {
+    public SpiderSessionDto() {
     }
 
     public String getId() {

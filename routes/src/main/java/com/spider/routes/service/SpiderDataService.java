@@ -56,7 +56,7 @@ public class SpiderDataService {
             spiderData.setSolutionFilename(String.format("%s_solution", spiderData.getFileId()));
             return spiderDataRepository.save(spiderData);
         } else {
-            throw new EntityNotFoundException("SpiderFile not found with id: " + id);
+            throw new EntityNotFoundException("SpiderData not found with id: " + id);
         }
     }
 

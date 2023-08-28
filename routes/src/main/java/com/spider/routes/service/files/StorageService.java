@@ -14,6 +14,8 @@ public interface StorageService {
 
     void store(MultipartFile file, UserDto userDto);
 
+    void storeJsonAsFile(String filename, String json);
+
     Stream<Path> loadAll();
 
     Path load(String filename);
