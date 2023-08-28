@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import AuthService from '../services/authService';
 
 const UploadFile = () => {
     const [files, setFiles] = useState<File[]>([]);
@@ -22,7 +23,7 @@ const UploadFile = () => {
         const formData = new FormData();
 
         for (let i = 0; i < files.length; i++) {
-            if (files[i].size > 1024) {
+            if (files[i].size > 5000000) {
                 setFileSize(false);
                 setFileUploadProgress(false);
                 setFileUploadResponse(null);
@@ -32,11 +33,11 @@ const UploadFile = () => {
             formData.append(`files`, files[i]);
         }
 
-        const requestOptions = {
+        fetch('/api/files/upload', {
             method: 'POST',
+            headers: { Authorization: AuthService.getAuthHeader() },
             body: formData
-        };
-        fetch('/api/files/upload', requestOptions)
+        })
             .then(async (response) => {
                 const isJson = response.headers
                     .get('content-type')

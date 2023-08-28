@@ -1,6 +1,6 @@
 package com.spider.routes;
 
-import com.spider.routes.service.StorageService;
+import com.spider.routes.service.files.StorageService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

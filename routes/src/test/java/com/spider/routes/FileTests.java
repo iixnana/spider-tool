@@ -1,7 +1,8 @@
 package com.spider.routes;
 
+import com.spider.routes.dto.UserDto;
 import com.spider.routes.exception.StorageFileNotFoundException;
-import com.spider.routes.service.StorageService;
+import com.spider.routes.service.files.StorageService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,7 @@ public class FileTests {
                 .andExpect(status().isFound())
                 .andExpect(header().string("Location", "/"));
 
-        then(this.storageService).should().store(multipartFile);
+        then(this.storageService).should().store(multipartFile, new UserDto(1L, "Kamile", "Test", "login", "token"));
     }
 
     @SuppressWarnings("unchecked")
