@@ -1,4 +1,4 @@
-package com.spider.routes.service;
+package com.spider.routes.service.files;
 
 import com.spider.routes.exception.StorageException;
 import com.spider.routes.exception.StorageFileNotFoundException;
@@ -23,9 +23,12 @@ import java.util.stream.Stream;
 public class FileSystemStorageService implements StorageService {
     private final Path rootLocation;
 
+    private final SpiderFileService spiderFileService;
+
     @Autowired
-    public FileSystemStorageService(StorageProperties properties) {
+    public FileSystemStorageService(StorageProperties properties, SpiderFileService spiderFileService) {
         this.rootLocation = Paths.get(properties.getLocation());
+        this.spiderFileService = spiderFileService;
     }
 
     @Override
@@ -34,6 +37,8 @@ public class FileSystemStorageService implements StorageService {
             if (file.isEmpty()) {
                 throw new StorageException("Failed to store empty file.");
             }
+
+
             Path destinationFile = this.rootLocation.resolve(
                             Paths.get(file.getOriginalFilename()))
                     .normalize().toAbsolutePath();
@@ -87,6 +92,7 @@ public class FileSystemStorageService implements StorageService {
 
     @Override
     public void deleteAll() {
+        spiderFileService.deleteAllSpiderFiles();
         FileSystemUtils.deleteRecursively(rootLocation.toFile());
     }
 

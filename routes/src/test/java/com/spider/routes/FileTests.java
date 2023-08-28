@@ -1,7 +1,7 @@
 package com.spider.routes;
 
 import com.spider.routes.exception.StorageFileNotFoundException;
-import com.spider.routes.service.StorageService;
+import com.spider.routes.service.files.StorageService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

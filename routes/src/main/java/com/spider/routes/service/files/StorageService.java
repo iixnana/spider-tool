@@ -1,4 +1,4 @@
-package com.spider.routes.service;
+package com.spider.routes.service.files;
 
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;

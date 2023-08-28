@@ -1,7 +1,7 @@
 package com.spider.routes.controller;
 
 import com.spider.routes.exception.StorageFileNotFoundException;
-import com.spider.routes.service.StorageService;
+import com.spider.routes.service.files.StorageService;
 import com.spider.routes.util.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
