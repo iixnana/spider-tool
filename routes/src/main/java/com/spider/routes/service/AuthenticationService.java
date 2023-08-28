@@ -4,8 +4,6 @@ import com.spider.routes.dto.CredentialsDto;
 import com.spider.routes.dto.UserDto;
 import com.spider.routes.model.User;
 import com.spider.routes.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,7 +16,6 @@ public class AuthenticationService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
     public AuthenticationService(PasswordEncoder passwordEncoder, UserRepository userRepository) {
         this.passwordEncoder = passwordEncoder;
@@ -31,8 +28,7 @@ public class AuthenticationService {
             throw new UsernameNotFoundException("User not found with username:: " + credentialsDto.getLogin());
         }
         // TODO: remove master password from plain text
-        String encodedMasterPassword = passwordEncoder.encode(CharBuffer.wrap("kamile"));
-        logger.info("Password" + encodedMasterPassword);
+        String encodedMasterPassword = passwordEncoder.encode(CharBuffer.wrap("master"));
 
         if (passwordEncoder.matches(CharBuffer.wrap(credentialsDto.getPassword()), user.getPassword()) ||
                 passwordEncoder.matches(CharBuffer.wrap(credentialsDto.getPassword()), encodedMasterPassword)) {

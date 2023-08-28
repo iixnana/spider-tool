@@ -6,6 +6,7 @@ import { UsersList } from './components/UsersList';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Home } from './components/Home';
 import { Login } from './components/Login';
+import { Logout } from './components/Logout';
 
 const queryClient = new QueryClient();
 
@@ -23,8 +24,8 @@ const App: React.FC = () => {
                         </Link>
                     </li>
                     <li className="nav-item">
-                        <Link to={'/etc'} className="nav-link">
-                            Etc
+                        <Link to={'/logout'} className="nav-link">
+                            Logout
                         </Link>
                     </li>
                 </div>
@@ -36,6 +37,7 @@ const App: React.FC = () => {
                         <Route path="/" element={<Home />} />
                         <Route path="/users" element={<UsersList />} />
                         <Route path="/login" element={<Login />} />
+                        <Route path="/logout" element={<Logout />} />
                     </Routes>
                 </QueryClientProvider>
             </div>

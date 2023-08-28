@@ -1,6 +1,9 @@
 import React, { useRef } from 'react';
+import AuthService from '../services/authService';
+import { useNavigate } from 'react-router-dom';
 
 export const Login: React.FC = () => {
+    const navigate = useNavigate();
     const formRef = useRef<HTMLFormElement>(null);
 
     const handleSubmit = async (event: {
@@ -23,7 +26,16 @@ export const Login: React.FC = () => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ login: username, password: password })
-        }).then((data) => console.log(data));
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                try {
+                    AuthService.setAuthCookies(data);
+                    navigate('/');
+                } catch (e) {
+                    throw new Error('Incorrect auth data');
+                }
+            });
     };
 
     return (
