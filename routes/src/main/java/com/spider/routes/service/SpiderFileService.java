@@ -26,6 +26,7 @@ public class SpiderFileService {
         return spiderFileRepository.findBySolutionFilenameIsNull();
     }
 
+    // TODO: Should use dto to avoid sending password
     public List<SpiderFile> getSpiderFilesByAuthor(User user) {
         return spiderFileRepository.findByAuthor(user);
     }
