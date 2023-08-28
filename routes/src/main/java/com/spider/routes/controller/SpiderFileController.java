@@ -26,7 +26,7 @@ public class SpiderFileController {
     }
 
     @GetMapping
-    public ResponseEntity<List<SpiderFile>> getAllFilesForUser(@AuthenticationPrincipal UserDto userDto) {
+    public ResponseEntity<List<SpiderFile>> getAllFilesRecordsForUser(@AuthenticationPrincipal UserDto userDto) {
         List<SpiderFile> spiderFiles = spiderFileService.getSpiderFilesByAuthor(userService.getUserById(userDto.getId()));
         return ResponseEntity.ok(spiderFiles);
     }

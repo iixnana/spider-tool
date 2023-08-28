@@ -67,8 +67,8 @@ public class FileSystemStorageService implements StorageService {
             }
 
             try {
-                double latitude = Double.parseDouble(coordinates[0]);
-                double longitude = Double.parseDouble(coordinates[1]);
+                Double.parseDouble(coordinates[0]);
+                Double.parseDouble(coordinates[1]);
             } catch (NumberFormatException e) {
                 return false; // Unable to parse coordinates as numbers
             }
@@ -137,9 +137,7 @@ public class FileSystemStorageService implements StorageService {
             if (resource.exists() || resource.isReadable()) {
                 return resource;
             } else {
-                throw new StorageFileNotFoundException(
-                        "Could not read file: " + filename);
-
+                throw new StorageFileNotFoundException("Could not read file: " + filename);
             }
         } catch (MalformedURLException e) {
             throw new StorageFileNotFoundException("Could not read file: " + filename, e);
@@ -189,10 +187,10 @@ public class FileSystemStorageService implements StorageService {
         return new Gson().fromJson(templateContent, JsonObject.class);
     }
 
-    private JsonObject createOrderJson(double latitude, double longitude) {
+    private JsonObject createOrderJson(double latitude, double longitude, int i) {
         JsonObject json = new JsonObject();
 
-        json.addProperty("id", "3316602");
+        json.addProperty("id", i);
         json.addProperty("type", "delivery");
 
         JsonArray sizeArray = new JsonArray();
@@ -200,7 +198,8 @@ public class FileSystemStorageService implements StorageService {
         json.add("size", sizeArray);
 
         JsonObject deliveryObject = new JsonObject();
-        deliveryObject.addProperty("address", "lat=56.9148408831298;lon=13.9884584483723");
+        String address = String.format("lat=%.7f;lon=%.7f", latitude, longitude);
+        deliveryObject.addProperty("address", address);
         json.add("delivery", deliveryObject);
 
         return json;
@@ -221,7 +220,7 @@ public class FileSystemStorageService implements StorageService {
             try {
                 double latitude = Double.parseDouble(coordinates[0]);
                 double longitude = Double.parseDouble(coordinates[1]);
-                JsonObject order = createOrderJson(latitude, longitude);
+                JsonObject order = createOrderJson(latitude, longitude, i);
                 ordersArray.add(order);
             } catch (NumberFormatException e) {
                 throw new InvalidFormatException("The file has incorrect format");

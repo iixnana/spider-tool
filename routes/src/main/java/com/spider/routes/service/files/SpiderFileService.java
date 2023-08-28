@@ -23,7 +23,7 @@ public class SpiderFileService {
     }
 
     public List<SpiderFile> getSpiderFilesWithoutSolution() {
-        return spiderFileRepository.findBySolutionFilenameEmpty();
+        return spiderFileRepository.findBySolutionFilenameIsNull();
     }
 
     public List<SpiderFile> getSpiderFilesByAuthor(User user) {

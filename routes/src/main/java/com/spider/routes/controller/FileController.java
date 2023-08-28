@@ -1,6 +1,7 @@
 package com.spider.routes.controller;
 
 import com.spider.routes.dto.UserDto;
+import com.spider.routes.exception.InvalidFormatException;
 import com.spider.routes.exception.StorageFileNotFoundException;
 import com.spider.routes.service.files.StorageService;
 import com.spider.routes.util.Response;
@@ -13,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,15 +31,14 @@ public class FileController {
         this.storageService = storageService;
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<String[]> getListFiles() {
         return ResponseEntity.status(HttpStatus.OK).body(storageService.loadAll().map(path -> path.getFileName().toString()).toArray(String[]::new));
     }
 
-    @GetMapping("/{filename:.+}")
+    @GetMapping("/file/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
-
         Resource file = storageService.loadAsResource(filename);
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=\"" + file.getFilename() + "\"").body(file);
@@ -64,5 +65,11 @@ public class FileController {
     @ExceptionHandler(StorageFileNotFoundException.class)
     public ResponseEntity<?> handleStorageFileNotFound(StorageFileNotFoundException exc) {
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{filename}")
+    public ResponseEntity<String> getFileAsSpiderJson(@PathVariable String filename) throws IOException, InvalidFormatException {
+        String fileFormattedAsJson = storageService.loadAsSpiderRequestJson(filename);
+        return ResponseEntity.ok(fileFormattedAsJson);
     }
 }
