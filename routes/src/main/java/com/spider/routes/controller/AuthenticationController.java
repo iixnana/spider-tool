@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("/api")
 public class AuthenticationController {
 
     private final UserService userService;

@@ -28,7 +28,7 @@ public class UsernamePasswordAuthFilter extends OncePerRequestFilter {
             HttpServletResponse httpServletResponse,
             FilterChain filterChain) throws ServletException, IOException {
 
-        if ("/v1/signIn".equals(httpServletRequest.getServletPath())
+        if ("/api/signIn".equals(httpServletRequest.getServletPath())
                 && HttpMethod.POST.matches(httpServletRequest.getMethod())) {
             CredentialsDto credentialsDto = MAPPER.readValue(httpServletRequest.getInputStream(), CredentialsDto.class);
 
