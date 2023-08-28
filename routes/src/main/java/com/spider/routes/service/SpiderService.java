@@ -11,6 +11,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+// TODO: Move API endpoint strings to separate file or application.properties
 @Service
 public class SpiderService {
     @Value("${spider.base-url}")
@@ -22,13 +23,46 @@ public class SpiderService {
         this.storageService = storageService;
     }
 
-    public String checkServerStatus() throws IOException, InterruptedException {
+    public HttpResponse<String> checkServerStatus() throws IOException, InterruptedException {
         String url = spiderBaseUrl + "/api/v1/server";
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.body());
-        return response.body();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public HttpResponse<String> checkSession(String sessionId) throws IOException, InterruptedException {
+        String url = spiderBaseUrl + "/api/v1/sessions/" + sessionId;
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public HttpResponse<String> checkSessionWarnings(String sessionId) throws IOException, InterruptedException {
+        String url = spiderBaseUrl + "/api/v1/sessions/" + sessionId + "/warnings";
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public HttpResponse<String> getBestSolution(String sessionId) throws IOException, InterruptedException {
+        String url = spiderBaseUrl + "/api/v1/sessions/" + sessionId + "/bestSolution";
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public HttpResponse<String> getBestSolutionRoute(String sessionId, String vId) throws IOException, InterruptedException {
+        String url = spiderBaseUrl + "/api/v1/sessions/" + sessionId + "/bestSolution/routes/" + vId;
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public HttpResponse<String> getUnservicedReasonForOrder(String sessionId, String orderId) throws IOException, InterruptedException {
+        String url = spiderBaseUrl + "/api/v1/sessions/" + sessionId + "/unservicedReason/" + orderId;
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     public HttpResponse<String> createSession(String problemFilename) throws IOException, InterruptedException, InvalidFormatException {
@@ -47,10 +81,30 @@ public class SpiderService {
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
-    public void checkSession(String sessionId) {
-        String url = spiderBaseUrl + "/api/v1/sessions/" + sessionId;
+    public HttpResponse<String> startOptimization(String sessionId) throws IOException, InterruptedException, InvalidFormatException {
+        String url = spiderBaseUrl + "/api/v1/sessions/" + sessionId + "/startOptimization";
         HttpClient client = HttpClient.newHttpClient();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/json")
+                .POST(null)
+                .build();
+
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
+    public HttpResponse<String> stopOptimization(String sessionId) throws IOException, InterruptedException, InvalidFormatException {
+        String url = spiderBaseUrl + "/api/v1/sessions/" + sessionId + "/stopOptimization";
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/json")
+                .POST(null)
+                .build();
+
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
 
 }
