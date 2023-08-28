@@ -83,12 +83,7 @@ public class FileSystemStorageService implements StorageService {
                 throw new StorageException("The file structure is invalid.");
             }
 
-            SpiderFile s = spiderFileService.createSpiderFile(userService.getUserById(userDto.getId()));
-            System.out.println(s.getAuthor());
-            System.out.println(s.getProblemFilename());
-            System.out.println(s.getCreatedOn());
-
-            SpiderFile spiderFile = spiderFileService.getSpiderFileById(s.getId());
+            SpiderFile spiderFile = spiderFileService.createSpiderFile(userService.getUserById(userDto.getId()));
 
             Path destinationFile = this.rootLocation.resolve(
                     Paths.get(spiderFile.getProblemFilename())

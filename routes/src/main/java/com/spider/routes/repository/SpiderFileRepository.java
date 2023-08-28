@@ -11,4 +11,6 @@ import java.util.UUID;
 @Repository
 public interface SpiderFileRepository extends JpaRepository<SpiderFile, UUID> {
     List<SpiderFile> findByAuthor(User author);
+
+    List<SpiderFile> findBySolutionFilenameEmpty();
 }
