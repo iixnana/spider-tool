@@ -18,12 +18,16 @@ public class SpiderDataService {
         this.spiderDataRepository = spiderDataRepository;
     }
 
-    public List<SpiderData> getSpiderFiles() {
+    public List<SpiderData> getSpiderData() {
         return spiderDataRepository.findAll();
     }
 
-    public List<SpiderData> getSpiderFilesWithoutSolution() {
+    public List<SpiderData> getSpiderDataWithoutSolution() {
         return spiderDataRepository.findBySolutionFilenameIsNull();
+    }
+
+    public List<SpiderData> getSpiderDataWithoutSessionId() {
+        return spiderDataRepository.findBySessionIdIsNull();
     }
 
     // TODO: Should use dto to avoid sending password
@@ -31,8 +35,8 @@ public class SpiderDataService {
         return spiderDataRepository.findByAuthor(user);
     }
 
-    public SpiderData getSpiderFileById(UUID uuid) {
-        return spiderDataRepository.findById(uuid).orElse(null);
+    public SpiderData getSpiderDataRowById(Long id) {
+        return spiderDataRepository.findById(id).orElse(null);
     }
 
     public SpiderData createSpiderFile(User author) {
@@ -40,24 +44,24 @@ public class SpiderDataService {
         UUID uuid = UUID.randomUUID();
         spiderData.setFileId(uuid);
         spiderData.setAuthor(author);
-        spiderData.setProblemFilename(String.format("%s_problem", uuid));
+        spiderData.setProblemFilename(String.valueOf(uuid));
         return spiderDataRepository.save(spiderData);
     }
 
-    public SpiderData updateSpiderFile(UUID uuid) {
-        Optional<SpiderData> optionalSpiderFile = spiderDataRepository.findById(uuid);
+    public SpiderData updateSpiderDataRowSolution(Long id) {
+        Optional<SpiderData> optionalSpiderFile = spiderDataRepository.findById(id);
 
         if (optionalSpiderFile.isPresent()) {
             SpiderData spiderData = optionalSpiderFile.get();
-            spiderData.setSolutionFilename(String.format("%s_solution", uuid));
+            spiderData.setSolutionFilename(String.format("%s_solution", spiderData.getFileId()));
             return spiderDataRepository.save(spiderData);
         } else {
-            throw new EntityNotFoundException("SpiderFile not found with id: " + uuid);
+            throw new EntityNotFoundException("SpiderFile not found with id: " + id);
         }
     }
 
-    public void deleteSpiderFile(UUID uuid) {
-        spiderDataRepository.deleteById(uuid);
+    public void deleteSpiderFile(Long id) {
+        spiderDataRepository.deleteById(id);
     }
 
     public void deleteAllSpiderFiles() {

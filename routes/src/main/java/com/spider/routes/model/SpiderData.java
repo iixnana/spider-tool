@@ -23,8 +23,9 @@ public class SpiderData {
     @Column(name = "solution_filename")
     private String solutionFilename;
 
-    @Column(name = "session_id")
-    private String sessionId;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "session", referencedColumnName = "id")
+    private SpiderSession session;
 
     @ManyToOne
     @JoinColumn(name = "author", nullable = false)
@@ -40,11 +41,11 @@ public class SpiderData {
     public SpiderData() {
     }
 
-    public SpiderData(UUID fileId, String problemFilename, String solutionFilename, String sessionId, User author, Instant createdOn, Instant lastUpdatedOn) {
+    public SpiderData(UUID fileId, String problemFilename, String solutionFilename, SpiderSession session, User author, Instant createdOn, Instant lastUpdatedOn) {
         this.fileId = fileId;
         this.problemFilename = problemFilename;
         this.solutionFilename = solutionFilename;
-        this.sessionId = sessionId;
+        this.session = session;
         this.author = author;
         this.createdOn = createdOn;
         this.lastUpdatedOn = lastUpdatedOn;
@@ -106,11 +107,11 @@ public class SpiderData {
         this.lastUpdatedOn = lastUpdatedOn;
     }
 
-    public String getSessionId() {
-        return sessionId;
+    public SpiderSession getSession() {
+        return session;
     }
 
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+    public void setSession(SpiderSession session) {
+        this.session = session;
     }
 }

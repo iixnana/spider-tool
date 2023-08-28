@@ -31,12 +31,13 @@ public class SpiderService {
         return response.body();
     }
 
-    public String createSession(String problemFilename) throws IOException, InterruptedException, InvalidFormatException {
+    public HttpResponse<String> createSession(String problemFilename) throws IOException, InterruptedException, InvalidFormatException {
         String url = spiderBaseUrl + "/api/v1/sessions";
         HttpClient client = HttpClient.newHttpClient();
 
         // Build the JSON request body
         String jsonBody = storageService.loadAsSpiderRequestJson(problemFilename);
+        System.out.println(jsonBody);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
@@ -44,9 +45,12 @@ public class SpiderService {
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build();
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.body());
-        return response.body();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public void checkSession(String sessionId) {
+        String url = spiderBaseUrl + "/api/v1/sessions/" + sessionId;
+        HttpClient client = HttpClient.newHttpClient();
     }
 
 

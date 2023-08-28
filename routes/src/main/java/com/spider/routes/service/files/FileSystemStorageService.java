@@ -29,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Locale;
 import java.util.stream.Stream;
 
 @Service
@@ -149,7 +150,7 @@ public class FileSystemStorageService implements StorageService {
     public String loadAsSpiderRequestJson(String filename) throws IOException, InvalidFormatException {
         Resource resource = loadAsResource(filename);
         String fileContent = getResourceAsString(resource);
-        return convertContentToSpiderFormat(fileContent);
+        return convertContentToSpiderFormat(fileContent, filename);
     }
 
     @Override
@@ -182,7 +183,7 @@ public class FileSystemStorageService implements StorageService {
         }
     }
 
-    private JsonObject getSpiderJsonTemplate() throws IOException {
+    private JsonObject getSpiderJsonTemplate() {
         Resource resource = resourceLoader.getResource("classpath:json_templates/template.json");
         String templateContent = getResourceAsString(resource);
         return new Gson().fromJson(templateContent, JsonObject.class);
@@ -199,14 +200,13 @@ public class FileSystemStorageService implements StorageService {
         json.add("size", sizeArray);
 
         JsonObject deliveryObject = new JsonObject();
-        String address = String.format("lat=%.7f;lon=%.7f", latitude, longitude);
+        String address = String.format(Locale.US, "lat=%.7f;lon=%.7f", latitude, longitude);
         deliveryObject.addProperty("address", address);
         json.add("delivery", deliveryObject);
-
         return json;
     }
 
-    private String convertContentToSpiderFormat(String content) throws InvalidFormatException, IOException {
+    private String convertContentToSpiderFormat(String content, String filename) throws InvalidFormatException, IOException {
         JsonArray ordersArray = new JsonArray();
         String[] lines = content.split("\n");
 
@@ -230,6 +230,7 @@ public class FileSystemStorageService implements StorageService {
         }
 
         JsonObject template = getSpiderJsonTemplate();
+        template.addProperty("id", filename);
         template.getAsJsonObject("vrp").add("orders", ordersArray);
         return template.toString();
     }

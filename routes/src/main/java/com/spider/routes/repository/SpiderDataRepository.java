@@ -6,11 +6,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.UUID;
 
 @Repository
-public interface SpiderDataRepository extends JpaRepository<SpiderData, UUID> {
+public interface SpiderDataRepository extends JpaRepository<SpiderData, Long> {
     List<SpiderData> findByAuthor(User author);
 
     List<SpiderData> findBySolutionFilenameIsNull();
+
+    List<SpiderData> findBySessionIdIsNull();
 }

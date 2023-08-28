@@ -22,7 +22,7 @@ public class SpiderDataController {
 
     @GetMapping
     public ResponseEntity<List<SpiderData>> getAllFiles() {
-        List<SpiderData> spiderData = spiderDataService.getSpiderFiles();
+        List<SpiderData> spiderData = spiderDataService.getSpiderData();
         return ResponseEntity.ok(spiderData);
     }
 }
