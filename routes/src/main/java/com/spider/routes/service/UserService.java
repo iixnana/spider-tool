@@ -1,5 +1,7 @@
 package com.spider.routes.service;
 
+import com.spider.routes.dto.SignUpDto;
+import com.spider.routes.dto.UserDto;
 import com.spider.routes.model.Role;
 import com.spider.routes.model.RoleName;
 import com.spider.routes.model.User;
@@ -44,5 +46,13 @@ public class UserService {
 
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
+    }
+
+    public UserDto signUp(SignUpDto user) {
+        return new UserDto(1L, "Kamile", "Nanartonyte", "login", "token");
+    }
+
+    public void signOut(UserDto user) {
+        // nothing to do at the moment
     }
 }
