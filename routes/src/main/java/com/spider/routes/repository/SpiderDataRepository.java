@@ -13,5 +13,5 @@ public interface SpiderDataRepository extends JpaRepository<SpiderData, Long> {
 
     List<SpiderData> findBySolutionFilenameIsNull();
 
-    List<SpiderData> findBySessionIdIsNull();
+    List<SpiderData> findBySessionIsNull();
 }

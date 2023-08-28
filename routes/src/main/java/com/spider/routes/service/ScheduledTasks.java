@@ -6,6 +6,7 @@ import com.spider.routes.model.SpiderData;
 import com.spider.routes.util.SessionCreationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +34,7 @@ public class ScheduledTasks {
     @Scheduled(fixedRate = 60000) // 60,000 milliseconds = 1 minute
     public void startSessionsTask() throws IOException, InterruptedException, InvalidFormatException {
         logger.info("Running scheduled startSessionsTask.");
-        List<SpiderData> collectedSpiderDataRows = spiderDataService.getSpiderDataWithoutSessionId();
+        List<SpiderData> collectedSpiderDataRows = spiderDataService.getSpiderDataWithoutSession();
 
         if (!collectedSpiderDataRows.isEmpty()) {
             int successfulCounter = 0;
@@ -43,13 +44,13 @@ public class ScheduledTasks {
             for (SpiderData row : collectedSpiderDataRows) {
                 HttpResponse<String> response = spiderService.createSession(row.getProblemFilename());
 
-                if (response.statusCode() == 201) {
-                    successfulCounter += 1;
+                if (response.statusCode() == HttpStatus.CREATED.value()) {
                     SessionCreationResponse parsedResponseBody = gson.fromJson(response.body(), SessionCreationResponse.class);
-                    // TODO: Add spiderSessionService create
+                    spiderSessionService.createSpiderSession(parsedResponseBody);
+                    successfulCounter += 1;
                 } else {
-                    failedCounter += 1;
                     logger.warn("Failed to start a session for {}. Response.body(): {}", row.getProblemFilename(), response.body());
+                    failedCounter += 1;
                 }
             }
             logger.info("startSessionsTask(): created session for {} rows, failed {} rows", successfulCounter, failedCounter);

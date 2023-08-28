@@ -37,7 +37,6 @@ public class SpiderService {
 
         // Build the JSON request body
         String jsonBody = storageService.loadAsSpiderRequestJson(problemFilename);
-        System.out.println(jsonBody);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))

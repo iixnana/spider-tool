@@ -95,7 +95,7 @@ public class FileSystemStorageService implements StorageService {
                 throw new StorageException("The file structure is invalid.");
             }
 
-            SpiderData spiderData = spiderDataService.createSpiderFile(userService.getUserById(userDto.getId()));
+            SpiderData spiderData = spiderDataService.createSpiderData(userService.getUserById(userDto.getId()));
 
             Path destinationFile = this.rootLocation.resolve(
                     Paths.get(spiderData.getProblemFilename())
@@ -155,7 +155,7 @@ public class FileSystemStorageService implements StorageService {
 
     @Override
     public void deleteAll() {
-        spiderDataService.deleteAllSpiderFiles();
+        spiderDataService.deleteAllSpiderData();
         FileSystemUtils.deleteRecursively(rootLocation.toFile());
     }
 

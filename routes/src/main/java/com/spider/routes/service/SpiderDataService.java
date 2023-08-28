@@ -26,12 +26,12 @@ public class SpiderDataService {
         return spiderDataRepository.findBySolutionFilenameIsNull();
     }
 
-    public List<SpiderData> getSpiderDataWithoutSessionId() {
-        return spiderDataRepository.findBySessionIdIsNull();
+    public List<SpiderData> getSpiderDataWithoutSession() {
+        return spiderDataRepository.findBySessionIsNull();
     }
 
     // TODO: Should use dto to avoid sending password
-    public List<SpiderData> getSpiderFilesByAuthor(User user) {
+    public List<SpiderData> getSpiderDataByAuthor(User user) {
         return spiderDataRepository.findByAuthor(user);
     }
 
@@ -39,7 +39,7 @@ public class SpiderDataService {
         return spiderDataRepository.findById(id).orElse(null);
     }
 
-    public SpiderData createSpiderFile(User author) {
+    public SpiderData createSpiderData(User author) {
         SpiderData spiderData = new SpiderData();
         UUID uuid = UUID.randomUUID();
         spiderData.setFileId(uuid);
@@ -49,10 +49,10 @@ public class SpiderDataService {
     }
 
     public SpiderData updateSpiderDataRowSolution(Long id) {
-        Optional<SpiderData> optionalSpiderFile = spiderDataRepository.findById(id);
+        Optional<SpiderData> optionalSpiderData = spiderDataRepository.findById(id);
 
-        if (optionalSpiderFile.isPresent()) {
-            SpiderData spiderData = optionalSpiderFile.get();
+        if (optionalSpiderData.isPresent()) {
+            SpiderData spiderData = optionalSpiderData.get();
             spiderData.setSolutionFilename(String.format("%s_solution", spiderData.getFileId()));
             return spiderDataRepository.save(spiderData);
         } else {
@@ -60,11 +60,11 @@ public class SpiderDataService {
         }
     }
 
-    public void deleteSpiderFile(Long id) {
+    public void deleteSpiderData(Long id) {
         spiderDataRepository.deleteById(id);
     }
 
-    public void deleteAllSpiderFiles() {
+    public void deleteAllSpiderData() {
         spiderDataRepository.deleteAll();
     }
 }
