@@ -1,9 +1,11 @@
 package com.spider.routes.service.files;
 
 import com.spider.routes.dto.UserDto;
+import com.spider.routes.exception.InvalidFormatException;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
@@ -18,5 +20,8 @@ public interface StorageService {
 
     Resource loadAsResource(String filename);
 
+    String loadAsSpiderRequestJson(String filename) throws IOException, InvalidFormatException;
+
     void deleteAll();
+
 }

@@ -1,6 +1,10 @@
 package com.spider.routes.service.files;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.spider.routes.dto.UserDto;
+import com.spider.routes.exception.InvalidFormatException;
 import com.spider.routes.exception.StorageException;
 import com.spider.routes.exception.StorageFileNotFoundException;
 import com.spider.routes.model.SpiderFile;
@@ -8,13 +12,16 @@ import com.spider.routes.service.UserService;
 import com.spider.routes.util.StorageProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -27,13 +34,16 @@ import java.util.stream.Stream;
 public class FileSystemStorageService implements StorageService {
     private final Path rootLocation;
 
+    private final ResourceLoader resourceLoader;
+
     private final SpiderFileService spiderFileService;
 
     private final UserService userService;
 
     @Autowired
-    public FileSystemStorageService(StorageProperties properties, SpiderFileService spiderFileService, UserService userService) {
+    public FileSystemStorageService(StorageProperties properties, ResourceLoader resourceLoader, SpiderFileService spiderFileService, UserService userService) {
         this.rootLocation = Paths.get(properties.getLocation());
+        this.resourceLoader = resourceLoader;
         this.spiderFileService = spiderFileService;
         this.userService = userService;
     }
@@ -137,6 +147,13 @@ public class FileSystemStorageService implements StorageService {
     }
 
     @Override
+    public String loadAsSpiderRequestJson(String filename) throws IOException, InvalidFormatException {
+        Resource resource = loadAsResource(filename);
+        String fileContent = getResourceAsString(resource);
+        return convertContentToSpiderFormat(fileContent);
+    }
+
+    @Override
     public void deleteAll() {
         spiderFileService.deleteAllSpiderFiles();
         FileSystemUtils.deleteRecursively(rootLocation.toFile());
@@ -149,5 +166,70 @@ public class FileSystemStorageService implements StorageService {
         } catch (IOException e) {
             throw new StorageException("Could not initialize storage", e);
         }
+    }
+
+    private String getResourceAsString(Resource resource) {
+        try (InputStream inputStream = resource.getInputStream();
+             InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+             BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+            StringBuilder contentBuilder = new StringBuilder();
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                contentBuilder.append(line);
+            }
+            return contentBuilder.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private JsonObject getSpiderJsonTemplate() throws IOException {
+        Resource resource = resourceLoader.getResource("classpath:json_templates/template.json");
+        String templateContent = getResourceAsString(resource);
+        return new Gson().fromJson(templateContent, JsonObject.class);
+    }
+
+    private JsonObject createOrderJson(double latitude, double longitude) {
+        JsonObject json = new JsonObject();
+
+        json.addProperty("id", "3316602");
+        json.addProperty("type", "delivery");
+
+        JsonArray sizeArray = new JsonArray();
+        sizeArray.add(1);
+        json.add("size", sizeArray);
+
+        JsonObject deliveryObject = new JsonObject();
+        deliveryObject.addProperty("address", "lat=56.9148408831298;lon=13.9884584483723");
+        json.add("delivery", deliveryObject);
+
+        return json;
+    }
+
+    private String convertContentToSpiderFormat(String content) throws InvalidFormatException, IOException {
+        JsonArray ordersArray = new JsonArray();
+        String[] lines = content.split("\n");
+        // Check if each subsequent line has the correct format
+        for (int i = 1; i < lines.length; i++) {
+            String line = lines[i].trim();
+            String[] coordinates = line.split(",");
+
+            if (coordinates.length != 2) {
+                throw new InvalidFormatException("The file has incorrect format");
+            }
+
+            try {
+                double latitude = Double.parseDouble(coordinates[0]);
+                double longitude = Double.parseDouble(coordinates[1]);
+                JsonObject order = createOrderJson(latitude, longitude);
+                ordersArray.add(order);
+            } catch (NumberFormatException e) {
+                throw new InvalidFormatException("The file has incorrect format");
+            }
+        }
+
+        JsonObject template = getSpiderJsonTemplate();
+        template.getAsJsonObject("vrp").add("orders", ordersArray);
+        return template.toString();
     }
 }
