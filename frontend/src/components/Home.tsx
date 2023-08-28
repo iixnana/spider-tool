@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import AuthService from '../services/authService';
 import { SpiderFileTable } from './SpiderFileTable';
 
@@ -10,12 +10,21 @@ export const Home: React.FC = () => {
         if (!AuthService.isAuthTokenValid()) {
             navigate('/login');
         }
-    });
+    }, [navigate]);
+
+    if (!AuthService.isAuthTokenValid()) {
+        return (
+            <div>
+                Please login
+                <Link to="/login" />
+            </div>
+        );
+    }
 
     return (
-        <div>
-            Hello world!
+        <>
+            Hello {AuthService.getUserToken()['firstName']}!
             <SpiderFileTable />
-        </div>
+        </>
     );
 };
