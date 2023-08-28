@@ -1,12 +1,8 @@
 package com.spider.routes.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -35,11 +31,6 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "author")
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<SpiderFile> spiderFiles;
 
     public User() {
     }
@@ -98,13 +89,5 @@ public class User {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public List<SpiderFile> getSpiderFiles() {
-        return spiderFiles;
-    }
-
-    public void setSpiderFiles(List<SpiderFile> spiderFiles) {
-        this.spiderFiles = spiderFiles;
     }
 }

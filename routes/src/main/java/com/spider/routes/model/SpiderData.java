@@ -8,16 +8,23 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "spider_files")
-public class SpiderFile {
+@Table(name = "spider_data")
+public class SpiderData {
     @Id
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "file_id", nullable = false)
+    private UUID fileId;
 
     @Column(name = "problem_filename", nullable = false)
     private String problemFilename;
 
-    @Column(name = "result_filename")
+    @Column(name = "solution_filename")
     private String solutionFilename;
+
+    @Column(name = "session_id")
+    private String sessionId;
 
     @ManyToOne
     @JoinColumn(name = "author", nullable = false)
@@ -30,22 +37,33 @@ public class SpiderFile {
     private Instant lastUpdatedOn;
 
 
-    public SpiderFile() {
+    public SpiderData() {
     }
 
-    public SpiderFile(String originalFilename, String problemFilename, String solutionFilename, User author, Instant lastUpdatedOn) {
+    public SpiderData(UUID fileId, String problemFilename, String solutionFilename, String sessionId, User author, Instant createdOn, Instant lastUpdatedOn) {
+        this.fileId = fileId;
         this.problemFilename = problemFilename;
         this.solutionFilename = solutionFilename;
+        this.sessionId = sessionId;
         this.author = author;
+        this.createdOn = createdOn;
         this.lastUpdatedOn = lastUpdatedOn;
     }
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public UUID getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(UUID fileId) {
+        this.fileId = fileId;
     }
 
     public String getProblemFilename() {
@@ -72,19 +90,27 @@ public class SpiderFile {
         this.author = author;
     }
 
-    public Instant getCreatedOn() {
-        return createdOn;
+    public String getCreatedOn() {
+        return createdOn.toString();
     }
 
     public void setCreatedOn(Instant createdOn) {
         this.createdOn = createdOn;
     }
 
-    public Instant getLastUpdatedOn() {
-        return lastUpdatedOn;
+    public String getLastUpdatedOn() {
+        return lastUpdatedOn.toString();
     }
 
     public void setLastUpdatedOn(Instant lastUpdatedOn) {
         this.lastUpdatedOn = lastUpdatedOn;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 }

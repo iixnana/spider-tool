@@ -7,8 +7,8 @@ import com.spider.routes.dto.UserDto;
 import com.spider.routes.exception.InvalidFormatException;
 import com.spider.routes.exception.StorageException;
 import com.spider.routes.exception.StorageFileNotFoundException;
-import com.spider.routes.model.SpiderFile;
-import com.spider.routes.service.SpiderFileService;
+import com.spider.routes.model.SpiderData;
+import com.spider.routes.service.SpiderDataService;
 import com.spider.routes.service.UserService;
 import com.spider.routes.util.StorageProperties;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,15 +37,15 @@ public class FileSystemStorageService implements StorageService {
 
     private final ResourceLoader resourceLoader;
 
-    private final SpiderFileService spiderFileService;
+    private final SpiderDataService spiderDataService;
 
     private final UserService userService;
 
     @Autowired
-    public FileSystemStorageService(StorageProperties properties, ResourceLoader resourceLoader, SpiderFileService spiderFileService, UserService userService) {
+    public FileSystemStorageService(StorageProperties properties, ResourceLoader resourceLoader, SpiderDataService spiderDataService, UserService userService) {
         this.rootLocation = Paths.get(properties.getLocation());
         this.resourceLoader = resourceLoader;
-        this.spiderFileService = spiderFileService;
+        this.spiderDataService = spiderDataService;
         this.userService = userService;
     }
 
@@ -94,10 +94,10 @@ public class FileSystemStorageService implements StorageService {
                 throw new StorageException("The file structure is invalid.");
             }
 
-            SpiderFile spiderFile = spiderFileService.createSpiderFile(userService.getUserById(userDto.getId()));
+            SpiderData spiderData = spiderDataService.createSpiderFile(userService.getUserById(userDto.getId()));
 
             Path destinationFile = this.rootLocation.resolve(
-                    Paths.get(spiderFile.getProblemFilename())
+                    Paths.get(spiderData.getProblemFilename())
             ).normalize().toAbsolutePath();
             if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
                 // Security check
@@ -154,7 +154,7 @@ public class FileSystemStorageService implements StorageService {
 
     @Override
     public void deleteAll() {
-        spiderFileService.deleteAllSpiderFiles();
+        spiderDataService.deleteAllSpiderFiles();
         FileSystemUtils.deleteRecursively(rootLocation.toFile());
     }
 
@@ -201,7 +201,7 @@ public class FileSystemStorageService implements StorageService {
         JsonObject deliveryObject = new JsonObject();
         String address = String.format("lat=%.7f;lon=%.7f", latitude, longitude);
         deliveryObject.addProperty("address", address);
-        json.add(String.valueOf("delivery"), deliveryObject);
+        json.add("delivery", deliveryObject);
 
         return json;
     }

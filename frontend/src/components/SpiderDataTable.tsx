@@ -1,15 +1,16 @@
 import { useQuery } from 'react-query';
 import AuthService from '../services/authService';
-import ISpiderFileData from '../types/SpiderFile';
+import ISpiderData from '../types/SpiderData';
 import { LoadingPage } from './LoadingComponents';
 import React from 'react';
 import UploadFile from './UploadFile';
+import moment from 'moment';
 
-export const SpiderFileTable: React.FC = () => {
+export const SpiderDataTable: React.FC = () => {
     const { error, data } = useQuery({
-        queryKey: 'spiderFilesList',
+        queryKey: 'spiderDataList',
         queryFn: () =>
-            fetch('/api/spider-files', {
+            fetch('/api/spider-data', {
                 headers: { Authorization: AuthService.getAuthHeader() }
             })
                 .then((response) => response.json())
@@ -27,8 +28,9 @@ export const SpiderFileTable: React.FC = () => {
                                     problemFilename: row.problemFilename,
                                     solutionFilename: row.solutionFilename,
                                     author: row.author,
-                                    createdOn: row.createdOn
-                                }) as ISpiderFileData
+                                    createdOn: row.createdOn,
+                                    lastUpdatedOn: row.createdOn
+                                }) as ISpiderData
                         );
                     } else {
                         throw new Error('Incorrect data format');
@@ -49,8 +51,10 @@ export const SpiderFileTable: React.FC = () => {
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Problem Filename</th>
-                        <th>Solution Filename</th>
+                        <th>Created on</th>
+                        <th>Last updated on</th>
+                        <th>Problem filename</th>
+                        <th>Solution filename</th>
                         <th>Author</th>
                     </tr>
                 </thead>
@@ -59,6 +63,16 @@ export const SpiderFileTable: React.FC = () => {
                     {data.map((row, i) => (
                         <tr key={i}>
                             <td>{row.id}</td>
+                            <td>
+                                {moment(row.createdOn).format(
+                                    'YYYY-MM-DD HH:mm:ss'
+                                )}
+                            </td>
+                            <td>
+                                {moment(row.lastUpdatedOn).format(
+                                    'YYYY-MM-DD HH:mm:ss'
+                                )}
+                            </td>
                             <td>{row.problemFilename}</td>
                             <td>{row.solutionFilename}</td>
                             <td>

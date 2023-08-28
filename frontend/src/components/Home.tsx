@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthService from '../services/authService';
-import { SpiderFileTable } from './SpiderFileTable';
+import { SpiderDataTable } from './SpiderDataTable';
 
 export const Home: React.FC = () => {
     const navigate = useNavigate();
@@ -24,7 +24,7 @@ export const Home: React.FC = () => {
     return (
         <>
             Hello {AuthService.getUserToken()['firstName']}!
-            <SpiderFileTable />
+            <SpiderDataTable />
         </>
     );
 };
