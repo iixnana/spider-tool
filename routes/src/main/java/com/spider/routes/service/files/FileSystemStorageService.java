@@ -148,9 +148,7 @@ public class FileSystemStorageService implements StorageService {
     @Override
     public String loadAsSpiderRequestJson(String filename) throws IOException, InvalidFormatException {
         Resource resource = loadAsResource(filename);
-        System.out.println(resource.getFilename());
         String fileContent = getResourceAsString(resource);
-        System.out.println(fileContent);
         return convertContentToSpiderFormat(fileContent);
     }
 
@@ -176,7 +174,7 @@ public class FileSystemStorageService implements StorageService {
             StringBuilder contentBuilder = new StringBuilder();
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                contentBuilder.append(line);
+                contentBuilder.append(line).append("\n");
             }
             return contentBuilder.toString();
         } catch (IOException e) {
@@ -203,7 +201,7 @@ public class FileSystemStorageService implements StorageService {
         JsonObject deliveryObject = new JsonObject();
         String address = String.format("lat=%.7f;lon=%.7f", latitude, longitude);
         deliveryObject.addProperty("address", address);
-        json.add("delivery", deliveryObject);
+        json.add(String.valueOf("delivery"), deliveryObject);
 
         return json;
     }
@@ -214,7 +212,6 @@ public class FileSystemStorageService implements StorageService {
 
         // Check if each subsequent line has the correct format
         for (int i = 1; i < lines.length; i++) {
-            System.out.println("Hello");
             String line = lines[i].trim();
             String[] coordinates = line.split(",");
 
@@ -233,7 +230,6 @@ public class FileSystemStorageService implements StorageService {
         }
 
         JsonObject template = getSpiderJsonTemplate();
-        System.out.println(ordersArray.get(0));
         template.getAsJsonObject("vrp").add("orders", ordersArray);
         return template.toString();
     }
