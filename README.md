@@ -17,3 +17,5 @@ database=postgres
 username=postgres
 password=admin
 ```
+
+Docker compose is in progress.
