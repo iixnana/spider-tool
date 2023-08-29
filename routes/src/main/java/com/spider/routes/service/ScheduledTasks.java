@@ -63,56 +63,46 @@ public class ScheduledTasks {
     }
 
     @Scheduled(fixedRate = 60000)
-    public void updateNewSessionsTask() throws IOException, InterruptedException {
-        logger.info("Running scheduled updateNewSessionsTask.");
+    public void updateSessionsNotReadyTask() throws IOException, InterruptedException, InvalidFormatException {
+        logger.info("Running scheduled updateSessionsNotReadyTask.");
         List<SpiderSession> collectedSpiderSessions = spiderSessionService.getSpiderSessionsNotReady();
 
         if (!collectedSpiderSessions.isEmpty()) {
             int successfulCounter = 0;
             int failedCounter = 0;
 
-            logger.info("updateNewSessionsTask(): checking session for {} rows", collectedSpiderSessions.size());
+            logger.info("updateSessionsNotReadyTask(): checking session for {} rows", collectedSpiderSessions.size());
             for (SpiderSession row : collectedSpiderSessions) {
                 HttpResponse<String> response = spiderService.getSession(row.getSessionId());
 
                 if (response.statusCode() == HttpStatus.OK.value()) {
                     SpiderSessionDto parsedResponseBody = gson.fromJson(response.body(), SpiderSessionDto.class);
-                    spiderSessionService.updateSpiderSession(row.getId(), parsedResponseBody);
+                    SpiderSession updatedSpiderSession = spiderSessionService.updateSpiderSession(row.getId(), parsedResponseBody);
+                    if (updatedSpiderSession.isReady()) {
+                        startOptimizationTask(row.getSessionId());
+                        spiderSessionService.updateSpiderSessionIsRunningOptimization(row.getId(), true);
+                    }
                     successfulCounter += 1;
                 } else {
                     logger.warn("Failed to check on a session for {}. Response.body(): {}", row.getSessionId(), response.body());
                     failedCounter += 1;
                 }
             }
-            logger.info("updateNewSessionsTask(): checking session for {} rows, failed {} rows", successfulCounter, failedCounter);
+            logger.info("updateSessionsNotReadyTask(): checking session for {} rows, failed {} rows", successfulCounter, failedCounter);
         }
     }
 
-    @Scheduled(fixedRate = 300000)
-    public void startOptimizationTask() throws IOException, InterruptedException, InvalidFormatException {
-        logger.info("Running scheduled startOptimizationTask.");
-        List<SpiderSession> collectedSpiderSessions = spiderSessionService.getSpiderSessionsWithoutOptimization();
+    private boolean startOptimizationTask(String sessionId) throws IOException, InterruptedException, InvalidFormatException {
+        logger.info("Session is ready, starting optimization");
+        HttpResponse<String> response = spiderService.startOptimization(sessionId);
 
-        if (!collectedSpiderSessions.isEmpty()) {
-            int successfulCounter = 0;
-            int failedCounter = 0;
-
-            logger.info("startOptimizationTask(): creating session for {} rows", collectedSpiderSessions.size());
-            for (SpiderSession row : collectedSpiderSessions) {
-                HttpResponse<String> response = spiderService.startOptimization(row.getSessionId());
-
-                if (response.statusCode() == HttpStatus.OK.value()) {
-                    response = spiderService.getSession(row.getSessionId());
-                    SpiderSessionDto parsedResponseBody = gson.fromJson(response.body(), SpiderSessionDto.class);
-                    spiderSessionService.updateSpiderSession(row.getId(), parsedResponseBody);
-                    successfulCounter += 1;
-                } else {
-                    logger.warn("Failed to start an optimization for {}. Response.body(): {}", row.getSessionId(), response.body());
-                    failedCounter += 1;
-                }
-            }
-            logger.info("startOptimizationTask(): created session for {} rows, failed {} rows", successfulCounter, failedCounter);
+        if (response.statusCode() == HttpStatus.OK.value()) {
+            return true;
+        } else {
+            // TODO: automate re-try in case it fails to start
+            logger.warn("Failed to start optimization for {}. Response status: {}", sessionId, response.statusCode());
         }
+        return false;
     }
 
     private void stopOptimization(String sessionId, Long rowId, List<Integer> solutionValues) throws IOException, InterruptedException, InvalidFormatException {
@@ -129,6 +119,7 @@ public class ScheduledTasks {
                     response = spiderService.getSession(sessionId);
                     SpiderSessionDto parsedResponseBody = gson.fromJson(response.body(), SpiderSessionDto.class);
                     spiderSessionService.updateSpiderSession(rowId, parsedResponseBody);
+                    spiderSessionService.updateSpiderSessionIsRunningOptimization(rowId, false);
                     logger.info("Successfully stopped optimization for {}", sessionId);
                 } else {
                     logger.info("Failed to stop optimization for {}", sessionId);
@@ -153,6 +144,11 @@ public class ScheduledTasks {
                 if (response.statusCode() == HttpStatus.OK.value()) {
                     SpiderSessionDto parsedResponseBody = gson.fromJson(response.body(), SpiderSessionDto.class);
                     SpiderSession spiderSession = spiderSessionService.updateSpiderSession(row.getId(), parsedResponseBody);
+
+                    System.out.println(row.isReady());
+                    System.out.println(row.getSessionId());
+                    System.out.println(row.isOptimizationIsRunning());
+                    System.out.println(row.getBestSolutionValue());
 
                     // Check if optimization needs to be stopped
                     stopOptimization(row.getSessionId(), row.getId(), spiderSession.getSolutionValues());

@@ -21,6 +21,8 @@ export const Home: React.FC = () => {
         );
     }
 
+    // TODO: Should refresh after files were uploaded
+
     return (
         <>
             <h2>Hello {AuthService.getUserToken()['firstName']}!</h2>

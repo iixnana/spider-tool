@@ -70,7 +70,7 @@ const UploadFile = () => {
         <>
             {fileUploadResponse != null && (
                 <div className="alert alert-success" role="alert">
-                    {fileUploadResponse}
+                    {fileUploadResponse}. You can reload the page now.
                 </div>
             )}
             {!fileSize && (
@@ -113,7 +113,7 @@ const UploadFile = () => {
                             className={buttonClassName}
                             disabled={files.length === 0 || fileUploadProgress}
                         >
-                            Upload
+                            Upload to system
                         </button>
                     )) || <LoadingButton />}
                 </div>

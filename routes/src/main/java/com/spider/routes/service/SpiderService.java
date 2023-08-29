@@ -88,7 +88,7 @@ public class SpiderService {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.noBody())
+                .POST(HttpRequest.BodyPublishers.ofString("{}"))
                 .build();
 
         return client.send(request, HttpResponse.BodyHandlers.ofString());

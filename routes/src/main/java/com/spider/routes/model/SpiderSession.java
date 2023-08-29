@@ -46,10 +46,13 @@ public class SpiderSession {
     @OneToOne(mappedBy = "session")
     private SpiderData spiderData;
 
+    @Column(name = "started_optimization")
+    private Boolean isAwaitingOptimization;
+
     public SpiderSession() {
     }
 
-    public SpiderSession(String sessionId, boolean isReady, String setupProgress, boolean optimizationIsRunning, int iterationCount, String optimizationTime, int bestSolutionValue, String errorDuringSetup, String internalOptimizerError, List<Integer> solutionValues) {
+    public SpiderSession(String sessionId, boolean isReady, String setupProgress, boolean optimizationIsRunning, int iterationCount, String optimizationTime, int bestSolutionValue, String errorDuringSetup, String internalOptimizerError, List<Integer> solutionValues, Boolean isAwaitingOptimization) {
         this.sessionId = sessionId;
         this.isReady = isReady;
         this.setupProgress = setupProgress;
@@ -60,6 +63,7 @@ public class SpiderSession {
         this.errorDuringSetup = errorDuringSetup;
         this.internalOptimizerError = internalOptimizerError;
         this.solutionValues = solutionValues;
+        this.isAwaitingOptimization = isAwaitingOptimization;
     }
 
     public Long getId() {
@@ -156,5 +160,13 @@ public class SpiderSession {
 
     public void setSpiderData(SpiderData spiderData) {
         this.spiderData = spiderData;
+    }
+
+    public Boolean getStartedAndAwaitingOptimization() {
+        return isAwaitingOptimization;
+    }
+
+    public void setStartedAndAwaitingOptimization(Boolean startedAndAwaitingOptimization) {
+        isAwaitingOptimization = startedAndAwaitingOptimization;
     }
 }

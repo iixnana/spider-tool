@@ -35,11 +35,11 @@ public class SpiderSessionService {
     }
 
     public List<SpiderSession> getSpiderSessionsWithRunningOptimization() {
-        return spiderSessionRepository.findByOptimizationIsRunningIsTrue();
+        return spiderSessionRepository.findByIsAwaitingOptimizationIsTrue();
     }
 
     public List<SpiderSession> getSpiderSessionsWithCompletedOptimization() {
-        return spiderSessionRepository.findByOptimizationIsRunningIsFalseAndIsReadyIsTrueAndBestSolutionValueIsNotNull();
+        return spiderSessionRepository.findByIsAwaitingOptimizationIsFalse();
     }
 
     public SpiderSession createSpiderSession(SpiderSessionDto session) {
@@ -53,8 +53,8 @@ public class SpiderSessionService {
                 session.getBestSolutionValue(),
                 session.getErrorDuringSetup(),
                 session.getInternalOptimizerError(),
-                new ArrayList<>()
-        );
+                new ArrayList<>(),
+                null);
         return spiderSessionRepository.save(spiderSession);
     }
 
@@ -62,7 +62,6 @@ public class SpiderSessionService {
         Optional<SpiderSession> optionalSession = spiderSessionRepository.findById(id);
         if (optionalSession.isPresent()) {
             SpiderSession spiderSession = optionalSession.get();
-
 
             spiderSession.setBestSolutionValue(session.getBestSolutionValue());
             spiderSession.setErrorDuringSetup(session.getErrorDuringSetup());
@@ -80,6 +79,17 @@ public class SpiderSessionService {
                 spiderSession.setSolutionValues(previousSolutions);
             }
 
+            return spiderSessionRepository.save(spiderSession);
+        } else {
+            throw new EntityNotFoundException("SpiderSession not found with id: " + id);
+        }
+    }
+
+    public SpiderSession updateSpiderSessionIsRunningOptimization(Long id, Boolean isRunningOptimization) {
+        Optional<SpiderSession> optionalSession = spiderSessionRepository.findById(id);
+        if (optionalSession.isPresent()) {
+            SpiderSession spiderSession = optionalSession.get();
+            spiderSession.setOptimizationIsRunning(isRunningOptimization);
             return spiderSessionRepository.save(spiderSession);
         } else {
             throw new EntityNotFoundException("SpiderSession not found with id: " + id);
