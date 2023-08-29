@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import AuthService from '../services/authService';
+import { LoadingButton } from './LoadingComponents';
 
 const UploadFile = () => {
     const [files, setFiles] = useState<File[]>([]);
@@ -23,7 +24,7 @@ const UploadFile = () => {
         const formData = new FormData();
 
         for (let i = 0; i < files.length; i++) {
-            if (files[i].size > 5000000) {
+            if (files[i].size > 1024000) {
                 setFileSize(false);
                 setFileUploadProgress(false);
                 setFileUploadResponse(null);
@@ -66,36 +67,58 @@ const UploadFile = () => {
     } ${files.length > 0 && !fileSize && 'btn-danger'}`;
 
     return (
-        <form onSubmit={fileSubmitHandler}>
-            <div className="btn-group" role="group" aria-label="Basic example">
-                <button type="button" className={buttonClassName}>
-                    <label htmlFor="file-upload" className="custom-file-upload">
-                        Choose files
-                    </label>
-                </button>
-
-                <input
-                    id="file-upload"
-                    type="file"
-                    multiple
-                    onChange={uploadFileHandler}
-                />
-                <button
-                    type="submit"
-                    className={buttonClassName}
-                    disabled={files.length === 0}
-                >
-                    Upload
-                </button>
-            </div>
-            {!fileSize && <p style={{ color: 'red' }}>File size exceeded!!</p>}
-            {fileUploadProgress && (
-                <p style={{ color: 'red' }}>Uploading File(s)</p>
-            )}
+        <>
             {fileUploadResponse != null && (
-                <p style={{ color: 'green' }}>{fileUploadResponse}</p>
+                <div className="alert alert-success" role="alert">
+                    {fileUploadResponse}
+                </div>
             )}
-        </form>
+            {!fileSize && (
+                <div className="alert alert-danger" role="alert">
+                    File size exceeded. It must be below 1024KB.
+                </div>
+            )}
+
+            <form onSubmit={fileSubmitHandler}>
+                <div
+                    className="btn-group"
+                    role="group"
+                    aria-label="Basic example"
+                >
+                    {(!fileUploadProgress && (
+                        <>
+                            <button
+                                type="button"
+                                className={buttonClassName}
+                                disabled={fileUploadProgress}
+                            >
+                                <label
+                                    htmlFor="file-upload"
+                                    className="custom-file-upload"
+                                >
+                                    Choose files
+                                </label>
+                            </button>
+                            <input
+                                id="file-upload"
+                                type="file"
+                                multiple
+                                onChange={uploadFileHandler}
+                            />
+                        </>
+                    )) || <LoadingButton />}
+                    {(!fileUploadProgress && (
+                        <button
+                            type="submit"
+                            className={buttonClassName}
+                            disabled={files.length === 0 || fileUploadProgress}
+                        >
+                            Upload
+                        </button>
+                    )) || <LoadingButton />}
+                </div>
+            </form>
+        </>
     );
 };
 export default UploadFile;
