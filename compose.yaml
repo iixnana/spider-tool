@@ -7,7 +7,7 @@ services:
       - 'POSTGRES_USER=myuser'
     ports:
       - '5432'
-  back-end:
+  backend:
     image: "routes:0.0.1"
     container_name: routes
     ports:
@@ -15,14 +15,9 @@ services:
     environment:
       - SPRING.PROFILES.ACTIVE=default
   frontend:
-    build: .
-    command: npm start
-    x-develop:
-      watch:
-        - action: sync
-          path: ./frontend
-          target: /src/frontend
-          ignore:
-            - node_modules/
-        - action: rebuild
-          path: ./frontend/package.json
+    image: "frontend:0.0.1"
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    links:
+      - backend
