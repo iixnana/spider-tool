@@ -1,7 +1,7 @@
 import { useQuery } from 'react-query';
 import AuthService from '../services/authService';
 import ISpiderData from '../types/SpiderData';
-import { LoadingButton, LoadingPage } from './LoadingComponents';
+import { LoadingObj, LoadingPage } from './LoadingComponents';
 import React from 'react';
 import UploadFile from './UploadFile';
 import moment from 'moment';
@@ -62,12 +62,12 @@ function DownloadSolutionFile(filename: string) {
     });
 }
 
-function DownloadFileFromServer(filename: string) {
+function DownloadFileFromServer(filename: string, appendToFilename: string) {
     return fetch(`/api/files/file/${filename}`, {
         headers: { Authorization: AuthService.getAuthHeader() }
     })
         .then((response) => response.blob())
-        .then((blob) => downloadBlobAsFile(blob, filename));
+        .then((blob) => downloadBlobAsFile(blob, filename + appendToFilename));
 }
 
 export const SpiderDataList: React.FC = () => {
@@ -145,7 +145,8 @@ export const SpiderDataList: React.FC = () => {
                                         className="btn btn-primary"
                                         onClick={() =>
                                             DownloadFileFromServer(
-                                                row.problemFilename
+                                                row.problemFilename,
+                                                ''
                                             )
                                         }
                                     >
@@ -166,18 +167,37 @@ export const SpiderDataList: React.FC = () => {
                             </td>
                             <td>
                                 {(row.solutionFilename && (
-                                    <button
-                                        type="submit"
-                                        className="btn btn-primary"
-                                        onClick={() =>
-                                            DownloadSolutionFile(
-                                                row.problemFilename
-                                            )
-                                        }
+                                    <div
+                                        className="btn-group"
+                                        role="group"
+                                        aria-label="Basic example"
                                     >
-                                        Download solution
-                                    </button>
-                                )) || <LoadingButton />}
+                                        <button
+                                            type="submit"
+                                            className="btn btn-primary"
+                                            onClick={() =>
+                                                DownloadFileFromServer(
+                                                    row.problemFilename,
+                                                    '_original'
+                                                )
+                                            }
+                                        >
+                                            Original solution
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            className="btn btn-primary"
+                                            onClick={() =>
+                                                DownloadFileFromServer(
+                                                    row.problemFilename,
+                                                    '_original'
+                                                )
+                                            }
+                                        >
+                                            Original solution
+                                        </button>
+                                    </div>
+                                )) || <LoadingObj />}
                             </td>
                             <td>
                                 {row.author.firstName} {row.author.lastName}

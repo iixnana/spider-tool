@@ -35,6 +35,13 @@ public class ScheduledTasks {
         this.storageService = storageService;
     }
 
+    @Scheduled(fixedRate = 1800000)
+    public void checkServerHealth() throws IOException, InterruptedException {
+        logger.info("Checking spider health");
+        HttpResponse<String> response = spiderService.checkServerStatus();
+        logger.info("Spider status: {}", response.statusCode());
+    }
+
     @Scheduled(fixedRate = 60000)
     public void startSessionsTask() throws IOException, InterruptedException, InvalidFormatException {
         logger.info("Running scheduled startSessionsTask.");
@@ -105,11 +112,11 @@ public class ScheduledTasks {
         return false;
     }
 
-    private void stopOptimization(String sessionId, Long rowId, List<Integer> solutionValues) throws IOException, InterruptedException, InvalidFormatException {
+    private void stopOptimization(String sessionId, Long rowId, List<Double> solutionValues) throws IOException, InterruptedException, InvalidFormatException {
         if (solutionValues.size() > 3) {
-            Integer last = solutionValues.get(solutionValues.size() - 1);
-            Integer secondToLast = solutionValues.get(solutionValues.size() - 2);
-            Integer thirdToLast = solutionValues.get(solutionValues.size() - 3);
+            Double last = solutionValues.get(solutionValues.size() - 1);
+            Double secondToLast = solutionValues.get(solutionValues.size() - 2);
+            Double thirdToLast = solutionValues.get(solutionValues.size() - 3);
 
             // Stop optimization if last three checks the value has not changed
             if (Objects.equals(last, secondToLast) && Objects.equals(secondToLast, thirdToLast)) {
@@ -131,15 +138,6 @@ public class ScheduledTasks {
     @Scheduled(fixedRate = 60000)
     public void checkSessionsTask() throws IOException, InterruptedException, InvalidFormatException {
         logger.info("Running scheduled checkSessionsTask.");
-        List<SpiderSession> all = spiderSessionService.getAllSpiderSessions();
-        for (SpiderSession row : all) {
-            System.out.println(row.isReady());
-            System.out.println(row.getSessionId());
-            System.out.println(row.isOptimizationIsRunning());
-            System.out.println(row.getBestSolutionValue());
-            System.out.println(row.getAwaitingOptimization());
-        }
-
         List<SpiderSession> collectedSpiderSessions = spiderSessionService.getSpiderSessionsWithRunningOptimization();
 
         if (!collectedSpiderSessions.isEmpty()) {
@@ -153,7 +151,6 @@ public class ScheduledTasks {
                 if (response.statusCode() == HttpStatus.OK.value()) {
                     SpiderSessionDto parsedResponseBody = gson.fromJson(response.body(), SpiderSessionDto.class);
                     SpiderSession spiderSession = spiderSessionService.updateSpiderSession(row.getId(), parsedResponseBody);
-
 
                     // Check if optimization needs to be stopped
                     stopOptimization(row.getSessionId(), row.getId(), spiderSession.getSolutionValues());

@@ -8,7 +8,7 @@ public class SpiderSessionDto {
     private boolean optimizationIsRunning;
     private int iterationCount;
     private String optimizationTime;
-    private int bestSolutionValue;
+    private double bestSolutionValue;
     private String internalOptimizerError;
 
     public SpiderSessionDto() {
@@ -62,11 +62,11 @@ public class SpiderSessionDto {
         this.optimizationTime = optimizationTime;
     }
 
-    public int getBestSolutionValue() {
+    public double getBestSolutionValue() {
         return bestSolutionValue;
     }
 
-    public void setBestSolutionValue(int bestSolutionValue) {
+    public void setBestSolutionValue(double bestSolutionValue) {
         this.bestSolutionValue = bestSolutionValue;
     }
 

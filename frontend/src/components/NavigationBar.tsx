@@ -7,7 +7,7 @@ export const NavigationBar: React.FC = () => {
 
     if (cookies.user === undefined) {
         return (
-            <nav className="navbar navbar-expand navbar-dark bg-dark">
+            <nav className="navbar navbar-expand-lg navbar-light bg-light">
                 <a href="/login" className="navbar-brand">
                     Home
                 </a>

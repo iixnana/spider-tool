@@ -31,7 +31,7 @@ public class SpiderSession {
     private String optimizationTime;
 
     @Column(name = "best_solution_value")
-    private Integer bestSolutionValue;
+    private Double bestSolutionValue;
 
     @Column(name = "error_during_setup")
     private String errorDuringSetup;
@@ -41,7 +41,7 @@ public class SpiderSession {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "solution_values")
-    private List<Integer> solutionValues;
+    private List<Double> solutionValues;
 
     @OneToOne(mappedBy = "session")
     private SpiderData spiderData;
@@ -52,7 +52,7 @@ public class SpiderSession {
     public SpiderSession() {
     }
 
-    public SpiderSession(String sessionId, boolean isReady, String setupProgress, boolean optimizationIsRunning, int iterationCount, String optimizationTime, int bestSolutionValue, String errorDuringSetup, String internalOptimizerError, List<Integer> solutionValues, Boolean isAwaitingOptimization) {
+    public SpiderSession(String sessionId, boolean isReady, String setupProgress, boolean optimizationIsRunning, int iterationCount, String optimizationTime, double bestSolutionValue, String errorDuringSetup, String internalOptimizerError, List<Double> solutionValues, Boolean isAwaitingOptimization) {
         this.sessionId = sessionId;
         this.isReady = isReady;
         this.setupProgress = setupProgress;
@@ -122,11 +122,11 @@ public class SpiderSession {
         this.optimizationTime = optimizationTime;
     }
 
-    public int getBestSolutionValue() {
+    public Double getBestSolutionValue() {
         return bestSolutionValue;
     }
 
-    public void setBestSolutionValue(int bestSolutionValue) {
+    public void setBestSolutionValue(Double bestSolutionValue) {
         this.bestSolutionValue = bestSolutionValue;
     }
 
@@ -146,11 +146,11 @@ public class SpiderSession {
         this.internalOptimizerError = internalOptimizerError;
     }
 
-    public List<Integer> getSolutionValues() {
+    public List<Double> getSolutionValues() {
         return solutionValues;
     }
 
-    public void setSolutionValues(List<Integer> solutionValues) {
+    public void setSolutionValues(List<Double> solutionValues) {
         this.solutionValues = solutionValues;
     }
 

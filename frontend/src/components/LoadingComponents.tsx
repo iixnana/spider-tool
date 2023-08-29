@@ -12,6 +12,16 @@ export const LoadingPage: React.FC = () => {
     );
 };
 
+export const LoadingObj: React.FC = () => {
+    return (
+        <div className="spinner-border" role="status">
+            <span className="sr-only" aria-hidden="true">
+                Loading...
+            </span>
+        </div>
+    );
+};
+
 export const LoadingButton: React.FC = () => {
     return (
         <button className="btn btn-primary" type="button" disabled>

@@ -74,7 +74,7 @@ public class SpiderSessionService {
 
             //Save current solution to compare with for progress
             if (session.getBestSolutionValue() != 0) {
-                List<Integer> previousSolutions = spiderSession.getSolutionValues();
+                List<Double> previousSolutions = spiderSession.getSolutionValues();
                 previousSolutions.add(session.getBestSolutionValue());
                 spiderSession.setSolutionValues(previousSolutions);
             }
