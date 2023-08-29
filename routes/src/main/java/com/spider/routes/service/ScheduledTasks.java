@@ -36,14 +36,14 @@ public class ScheduledTasks {
         this.storageService = storageService;
     }
 
-    @Scheduled(fixedRate = 1800000)
+    @Scheduled(fixedRate = 1800000) // Every 30 minutes
     public void checkServerHealth() throws IOException, InterruptedException {
         logger.info("Checking spider health");
         HttpResponse<String> response = spiderService.checkServerStatus();
         logger.info("Spider status: {}", response.statusCode());
     }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 60000) // Every 1 minute
     public void startSessionsTask() throws IOException, InterruptedException, InvalidFormatException {
         logger.info("Running scheduled startSessionsTask.");
         List<SpiderData> collectedSpiderDataRows = spiderDataService.getSpiderDataWithoutSession();
@@ -115,9 +115,10 @@ public class ScheduledTasks {
 
     private void stopOptimization(String sessionId, Long rowId, List<Double> solutionValues) throws IOException, InterruptedException, InvalidFormatException {
         if (solutionValues.size() > 3) {
-            Double last = solutionValues.get(solutionValues.size() - 1);
-            Double secondToLast = solutionValues.get(solutionValues.size() - 2);
-            Double thirdToLast = solutionValues.get(solutionValues.size() - 3);
+            // Looking for more significant change
+            Double last = (double) Math.round(solutionValues.get(solutionValues.size() - 1));
+            Double secondToLast = (double) Math.round(solutionValues.get(solutionValues.size() - 2));
+            Double thirdToLast = (double) Math.round(solutionValues.get(solutionValues.size() - 3));
 
             // Stop optimization if last three checks the value has not changed
             if (Objects.equals(last, secondToLast) && Objects.equals(secondToLast, thirdToLast)) {
