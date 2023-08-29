@@ -27,7 +27,7 @@ public class SpiderSessionService {
     }
 
     public List<SpiderSession> getSpiderSessionsWithoutOptimization() {
-        return spiderSessionRepository.findByIsReadyIsTrueAndIterationCountIs(0);
+        return spiderSessionRepository.findByIsReadyIsTrueAndOptimizationIsRunningIsFalseAndIterationCountIs(0);
     }
 
     public List<SpiderSession> getSpiderSessionsNotReady() {

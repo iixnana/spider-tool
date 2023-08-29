@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface SpiderSessionRepository extends JpaRepository<SpiderSession, Long> {
-    List<SpiderSession> findByIsReadyIsTrueAndIterationCountIs(int count);
+    List<SpiderSession> findByIsReadyIsTrueAndOptimizationIsRunningIsFalseAndIterationCountIs(int count);
 
     List<SpiderSession> findByOptimizationIsRunningIsTrue();
 

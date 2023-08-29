@@ -35,7 +35,7 @@ public class ScheduledTasks {
         this.storageService = storageService;
     }
 
-    @Scheduled(fixedRate = 60000) // 60,000 milliseconds = 1 minute
+    @Scheduled(fixedRate = 60000)
     public void startSessionsTask() throws IOException, InterruptedException, InvalidFormatException {
         logger.info("Running scheduled startSessionsTask.");
         List<SpiderData> collectedSpiderDataRows = spiderDataService.getSpiderDataWithoutSession();
@@ -62,7 +62,7 @@ public class ScheduledTasks {
         }
     }
 
-    @Scheduled(fixedRate = 60000) // 60,000 milliseconds = 1 minute
+    @Scheduled(fixedRate = 60000)
     public void updateNewSessionsTask() throws IOException, InterruptedException {
         logger.info("Running scheduled updateNewSessionsTask.");
         List<SpiderSession> collectedSpiderSessions = spiderSessionService.getSpiderSessionsNotReady();
@@ -88,7 +88,7 @@ public class ScheduledTasks {
         }
     }
 
-    @Scheduled(fixedRate = 60000) // 60,000 milliseconds = 1 minute
+    @Scheduled(fixedRate = 300000)
     public void startOptimizationTask() throws IOException, InterruptedException, InvalidFormatException {
         logger.info("Running scheduled startOptimizationTask.");
         List<SpiderSession> collectedSpiderSessions = spiderSessionService.getSpiderSessionsWithoutOptimization();
@@ -104,6 +104,7 @@ public class ScheduledTasks {
                 if (response.statusCode() == HttpStatus.OK.value()) {
                     response = spiderService.getSession(row.getSessionId());
                     SpiderSessionDto parsedResponseBody = gson.fromJson(response.body(), SpiderSessionDto.class);
+                    spiderSessionService.updateSpiderSession(row.getId(), parsedResponseBody);
                     successfulCounter += 1;
                 } else {
                     logger.warn("Failed to start an optimization for {}. Response.body(): {}", row.getSessionId(), response.body());
@@ -136,7 +137,7 @@ public class ScheduledTasks {
         }
     }
 
-    @Scheduled(fixedRate = 60000) // 60,000 milliseconds = 1 minute
+    @Scheduled(fixedRate = 60000)
     public void checkSessionsTask() throws IOException, InterruptedException, InvalidFormatException {
         logger.info("Running scheduled checkSessionsTask.");
         List<SpiderSession> collectedSpiderSessions = spiderSessionService.getSpiderSessionsWithRunningOptimization();
@@ -166,7 +167,7 @@ public class ScheduledTasks {
         }
     }
 
-    @Scheduled(fixedRate = 60000) // 60,000 milliseconds = 1 minute
+    @Scheduled(fixedRate = 60000)
     public void downloadBestSolutionsTask() throws IOException, InterruptedException, InvalidFormatException {
         logger.info("Running scheduled downloadBestSolutionsTask.");
         List<SpiderSession> collectedSpiderSessions = spiderSessionService.getSpiderSessionsWithCompletedOptimization();
