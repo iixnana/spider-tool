@@ -208,7 +208,7 @@ public class ScheduledTasks {
                     failedCounter += 1;
                 }
             }
-            logger.info("downloadBestSolutionsTask(): checking session for {} rows, failed {} rows", successfulCounter, failedCounter);
+            logger.info("downloadBestSolutionsTask(): downloaded solution for {} rows, failed {} rows", successfulCounter, failedCounter);
         }
     }
 }
