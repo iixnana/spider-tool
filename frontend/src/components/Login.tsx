@@ -41,20 +41,32 @@ export const Login: React.FC = () => {
     return (
         <form ref={formRef} onSubmit={handleSubmit}>
             <div>
-                <label>
-                    Username:
-                    <input type="text" name="username" />
-                </label>
+                <div className="form-group">
+                    <label htmlFor="username">Username</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="username"
+                        name="username"
+                        placeholder="Enter username"
+                    />
+                </div>
             </div>
             <div>
-                <label>
-                    Password:
-                    <input type="password" name="password" />
-                </label>
+                <div className="form-group">
+                    <label htmlFor="password">Password</label>
+                    <input
+                        type="password"
+                        className="form-control"
+                        id="password"
+                        name="password"
+                        placeholder="Enter password"
+                    />
+                </div>
             </div>
-            <div>
-                <input type="submit" value="Log in" />
-            </div>
+            <button type="submit" className="btn btn-primary">
+                Log in
+            </button>
         </form>
     );
 };

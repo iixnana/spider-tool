@@ -3,6 +3,8 @@ package com.spider.routes.service.files;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.opencsv.CSVWriter;
+import com.spider.routes.dto.RouteDto;
 import com.spider.routes.dto.UserDto;
 import com.spider.routes.exception.InvalidFormatException;
 import com.spider.routes.exception.StorageException;
@@ -244,5 +246,30 @@ public class FileSystemStorageService implements StorageService {
         template.addProperty("id", filename);
         template.getAsJsonObject("vrp").add("orders", ordersArray);
         return template.toString();
+    }
+
+    @Override
+    public void writeRouteDataToCsv(RouteDto routeDto, String filename) throws IOException {
+        String destinationFile = this.rootLocation.resolve(
+                Paths.get(filename + "_csv")
+        ).normalize().toAbsolutePath().toString();
+        try (CSVWriter csvWriter = new CSVWriter(new FileWriter(destinationFile))) {
+            // Write header
+            String[] header = {"Vehicle ID", "Type", "Order ID", "Start Time", "Duration"};
+            csvWriter.writeNext(header);
+
+            // Write route and visit data
+            for (RouteDto.Route route : routeDto.getRoutes()) {
+                String vehicleId = route.getVehicleId();
+                for (RouteDto.Visit visit : route.getVisits()) {
+                    String type = visit.getType();
+                    String orderId = visit.getOrderId();
+                    String startTime = visit.getStartTime();
+                    String duration = visit.getDuration();
+                    String[] row = {vehicleId, type, orderId, startTime, duration};
+                    csvWriter.writeNext(row);
+                }
+            }
+        }
     }
 }

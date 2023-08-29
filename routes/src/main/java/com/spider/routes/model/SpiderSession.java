@@ -46,13 +46,16 @@ public class SpiderSession {
     @OneToOne(mappedBy = "session")
     private SpiderData spiderData;
 
-    @Column(name = "started_optimization")
+    @Column(name = "awaiting_optimization")
     private Boolean isAwaitingOptimization;
+
+    @Column(name = "is_downloaded", nullable = false)
+    private Boolean isDownloaded;
 
     public SpiderSession() {
     }
 
-    public SpiderSession(String sessionId, boolean isReady, String setupProgress, boolean optimizationIsRunning, int iterationCount, String optimizationTime, double bestSolutionValue, String errorDuringSetup, String internalOptimizerError, List<Double> solutionValues, Boolean isAwaitingOptimization) {
+    public SpiderSession(String sessionId, boolean isReady, String setupProgress, boolean optimizationIsRunning, int iterationCount, String optimizationTime, double bestSolutionValue, String errorDuringSetup, String internalOptimizerError, List<Double> solutionValues, Boolean isAwaitingOptimization, Boolean isDownloaded) {
         this.sessionId = sessionId;
         this.isReady = isReady;
         this.setupProgress = setupProgress;
@@ -64,6 +67,7 @@ public class SpiderSession {
         this.internalOptimizerError = internalOptimizerError;
         this.solutionValues = solutionValues;
         this.isAwaitingOptimization = isAwaitingOptimization;
+        this.isDownloaded = isDownloaded;
     }
 
     public Long getId() {
@@ -168,5 +172,13 @@ public class SpiderSession {
 
     public void setAwaitingOptimization(Boolean awaitingOptimization) {
         isAwaitingOptimization = awaitingOptimization;
+    }
+
+    public Boolean getDownloaded() {
+        return isDownloaded;
+    }
+
+    public void setDownloaded(Boolean downloaded) {
+        isDownloaded = downloaded;
     }
 }

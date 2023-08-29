@@ -39,7 +39,7 @@ public class SpiderSessionService {
     }
 
     public List<SpiderSession> getSpiderSessionsWithCompletedOptimization() {
-        return spiderSessionRepository.findByIsAwaitingOptimizationIsFalse();
+        return spiderSessionRepository.findByIsAwaitingOptimizationIsFalseAndIsDownloadedIsFalse();
     }
 
     public SpiderSession createSpiderSession(SpiderSessionDto session) {
@@ -54,7 +54,8 @@ public class SpiderSessionService {
                 session.getErrorDuringSetup(),
                 session.getInternalOptimizerError(),
                 new ArrayList<>(),
-                null);
+                null,
+                false);
         return spiderSessionRepository.save(spiderSession);
     }
 
@@ -90,6 +91,17 @@ public class SpiderSessionService {
         if (optionalSession.isPresent()) {
             SpiderSession spiderSession = optionalSession.get();
             spiderSession.setAwaitingOptimization(isAwaitingOptimization);
+            return spiderSessionRepository.save(spiderSession);
+        } else {
+            throw new EntityNotFoundException("SpiderSession not found with id: " + id);
+        }
+    }
+
+    public SpiderSession updateSpiderSessionDownloadedSolution(Long id, Boolean isDownloaded) {
+        Optional<SpiderSession> optionalSession = spiderSessionRepository.findById(id);
+        if (optionalSession.isPresent()) {
+            SpiderSession spiderSession = optionalSession.get();
+            spiderSession.setDownloaded(isDownloaded);
             return spiderSessionRepository.save(spiderSession);
         } else {
             throw new EntityNotFoundException("SpiderSession not found with id: " + id);

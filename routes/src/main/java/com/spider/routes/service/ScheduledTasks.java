@@ -1,6 +1,7 @@
 package com.spider.routes.service;
 
 import com.google.gson.Gson;
+import com.spider.routes.dto.RouteDto;
 import com.spider.routes.dto.SpiderSessionDto;
 import com.spider.routes.exception.InvalidFormatException;
 import com.spider.routes.model.SpiderData;
@@ -156,6 +157,13 @@ public class ScheduledTasks {
                     stopOptimization(row.getSessionId(), row.getId(), spiderSession.getSolutionValues());
 
                     successfulCounter += 1;
+                } else if (response.statusCode() == HttpStatus.NOT_FOUND.value()) {
+                    // Restart session
+                    response = spiderService.createSession(row.getSpiderData().getProblemFilename());
+
+                    if (!(response.statusCode() == HttpStatus.CREATED.value())) {
+                        logger.warn("Failed to re-start a session with id: {}. Response.body(): {}", row.getSessionId(), response.body());
+                    }
                 } else {
                     logger.warn("Failed to check on a session for {}. Response.body(): {}", row.getSessionId(), response.body());
                     failedCounter += 1;
@@ -179,10 +187,15 @@ public class ScheduledTasks {
                 HttpResponse<String> response = spiderService.getBestSolution(row.getSessionId());
 
                 if (response.statusCode() == HttpStatus.OK.value()) {
-                    // RouteDto parsedResponseBody = gson.fromJson(response.body(), RouteDto.class);
-                    // TODO: Parse data and do actions with it, like downloading individual routes, fetch data about unservicedReasons, etc.
+                    // Process data and store as csv
+                    RouteDto parsedResponseBody = gson.fromJson(response.body(), RouteDto.class);
+                    storageService.writeRouteDataToCsv(parsedResponseBody, row.getSpiderData().getSolutionFilename());
+                    // Update spider data with solution filename
                     SpiderData spiderData = spiderDataService.updateSpiderDataRowSolution(row.getSpiderData().getId());
                     storageService.storeJsonAsFile(spiderData.getSolutionFilename(), response.body());
+                    // Delete session
+                    spiderSessionService.updateSpiderSessionDownloadedSolution(row.getId(), true);
+                    spiderService.deleteSession(row.getSessionId());
                     successfulCounter += 1;
                 } else {
                     logger.warn("Failed to download best solution for {}. Response.body(): {}", row.getSessionId(), response.body());

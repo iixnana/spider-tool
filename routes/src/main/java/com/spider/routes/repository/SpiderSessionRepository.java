@@ -12,9 +12,7 @@ public interface SpiderSessionRepository extends JpaRepository<SpiderSession, Lo
 
     List<SpiderSession> findByIsAwaitingOptimizationIsTrue();
 
-    List<SpiderSession> findByIsAwaitingOptimizationIsFalse();
-
-    List<SpiderSession> findByOptimizationIsRunningIsFalseAndIsReadyIsTrueAndBestSolutionValueIsNot(int value);
+    List<SpiderSession> findByIsAwaitingOptimizationIsFalseAndIsDownloadedIsFalse();
 
     List<SpiderSession> findByIsReadyIsFalse();
 }

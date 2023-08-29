@@ -37,6 +37,16 @@ public class SpiderService {
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
+    public HttpResponse<String> deleteSession(String sessionId) throws IOException, InterruptedException {
+        String url = spiderBaseUrl + "/api/v1/sessions/" + sessionId;
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .DELETE()  // Set the request method to DELETE
+                .build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
     public HttpResponse<String> getSessionWarnings(String sessionId) throws IOException, InterruptedException {
         String url = spiderBaseUrl + "/api/v1/sessions/" + sessionId + "/warnings";
         HttpClient client = HttpClient.newHttpClient();
@@ -101,7 +111,7 @@ public class SpiderService {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .header("Content-Type", "application/json")
-                .POST(null)
+                .POST(HttpRequest.BodyPublishers.ofString("{}"))
                 .build();
 
         return client.send(request, HttpResponse.BodyHandlers.ofString());
