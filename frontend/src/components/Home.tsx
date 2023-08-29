@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthService from '../services/authService';
-import { SpiderFileTable } from './SpiderFileTable';
+import { SpiderDataList } from './SpiderDataList';
 
 export const Home: React.FC = () => {
     const navigate = useNavigate();
@@ -21,10 +21,12 @@ export const Home: React.FC = () => {
         );
     }
 
+    // TODO: Should refresh after files were uploaded
+    // TODO: Add nicer formatting of page
     return (
         <>
-            Hello {AuthService.getUserToken()['firstName']}!
-            <SpiderFileTable />
+            <h2>Hello {AuthService.getUserToken()['firstName']}!</h2>
+            <SpiderDataList />
         </>
     );
 };

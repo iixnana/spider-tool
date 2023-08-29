@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap.css';
 import { Route, Routes } from 'react-router-dom';
 import { UsersList } from './components/UsersList';
 import { QueryClient, QueryClientProvider } from 'react-query';

@@ -3,12 +3,14 @@ package com.spider.routes.service.files;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.opencsv.CSVWriter;
+import com.spider.routes.dto.RouteDto;
 import com.spider.routes.dto.UserDto;
 import com.spider.routes.exception.InvalidFormatException;
 import com.spider.routes.exception.StorageException;
 import com.spider.routes.exception.StorageFileNotFoundException;
-import com.spider.routes.model.SpiderFile;
-import com.spider.routes.service.SpiderFileService;
+import com.spider.routes.model.SpiderData;
+import com.spider.routes.service.SpiderDataService;
 import com.spider.routes.service.UserService;
 import com.spider.routes.util.StorageProperties;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,16 +21,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Locale;
 import java.util.stream.Stream;
 
 @Service
@@ -37,15 +37,15 @@ public class FileSystemStorageService implements StorageService {
 
     private final ResourceLoader resourceLoader;
 
-    private final SpiderFileService spiderFileService;
+    private final SpiderDataService spiderDataService;
 
     private final UserService userService;
 
     @Autowired
-    public FileSystemStorageService(StorageProperties properties, ResourceLoader resourceLoader, SpiderFileService spiderFileService, UserService userService) {
+    public FileSystemStorageService(StorageProperties properties, ResourceLoader resourceLoader, SpiderDataService spiderDataService, UserService userService) {
         this.rootLocation = Paths.get(properties.getLocation());
         this.resourceLoader = resourceLoader;
-        this.spiderFileService = spiderFileService;
+        this.spiderDataService = spiderDataService;
         this.userService = userService;
     }
 
@@ -94,10 +94,10 @@ public class FileSystemStorageService implements StorageService {
                 throw new StorageException("The file structure is invalid.");
             }
 
-            SpiderFile spiderFile = spiderFileService.createSpiderFile(userService.getUserById(userDto.getId()));
+            SpiderData spiderData = spiderDataService.createSpiderData(userService.getUserById(userDto.getId()));
 
             Path destinationFile = this.rootLocation.resolve(
-                    Paths.get(spiderFile.getProblemFilename())
+                    Paths.get(spiderData.getProblemFilename())
             ).normalize().toAbsolutePath();
             if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
                 // Security check
@@ -108,6 +108,20 @@ public class FileSystemStorageService implements StorageService {
                 Files.copy(inputStream, destinationFile,
                         StandardCopyOption.REPLACE_EXISTING);
             }
+        } catch (IOException e) {
+            throw new StorageException("Failed to store file.", e);
+        }
+    }
+
+    @Override
+    public void storeJsonAsFile(String filename, String json) {
+        String destinationFile = this.rootLocation.resolve(
+                Paths.get(filename)
+        ).normalize().toAbsolutePath().toString();
+
+        try (FileWriter writer = new FileWriter(destinationFile)) {
+            // Write the JSON string to the file
+            writer.write(json);
         } catch (IOException e) {
             throw new StorageException("Failed to store file.", e);
         }
@@ -148,15 +162,13 @@ public class FileSystemStorageService implements StorageService {
     @Override
     public String loadAsSpiderRequestJson(String filename) throws IOException, InvalidFormatException {
         Resource resource = loadAsResource(filename);
-        System.out.println(resource.getFilename());
         String fileContent = getResourceAsString(resource);
-        System.out.println(fileContent);
-        return convertContentToSpiderFormat(fileContent);
+        return convertContentToSpiderFormat(fileContent, filename);
     }
 
     @Override
     public void deleteAll() {
-        spiderFileService.deleteAllSpiderFiles();
+        spiderDataService.deleteAllSpiderData();
         FileSystemUtils.deleteRecursively(rootLocation.toFile());
     }
 
@@ -176,7 +188,7 @@ public class FileSystemStorageService implements StorageService {
             StringBuilder contentBuilder = new StringBuilder();
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                contentBuilder.append(line);
+                contentBuilder.append(line).append("\n");
             }
             return contentBuilder.toString();
         } catch (IOException e) {
@@ -184,7 +196,7 @@ public class FileSystemStorageService implements StorageService {
         }
     }
 
-    private JsonObject getSpiderJsonTemplate() throws IOException {
+    private JsonObject getSpiderJsonTemplate() {
         Resource resource = resourceLoader.getResource("classpath:json_templates/template.json");
         String templateContent = getResourceAsString(resource);
         return new Gson().fromJson(templateContent, JsonObject.class);
@@ -201,20 +213,18 @@ public class FileSystemStorageService implements StorageService {
         json.add("size", sizeArray);
 
         JsonObject deliveryObject = new JsonObject();
-        String address = String.format("lat=%.7f;lon=%.7f", latitude, longitude);
+        String address = String.format(Locale.US, "lat=%.7f;lon=%.7f", latitude, longitude);
         deliveryObject.addProperty("address", address);
         json.add("delivery", deliveryObject);
-
         return json;
     }
 
-    private String convertContentToSpiderFormat(String content) throws InvalidFormatException, IOException {
+    private String convertContentToSpiderFormat(String content, String filename) throws InvalidFormatException, IOException {
         JsonArray ordersArray = new JsonArray();
         String[] lines = content.split("\n");
 
         // Check if each subsequent line has the correct format
         for (int i = 1; i < lines.length; i++) {
-            System.out.println("Hello");
             String line = lines[i].trim();
             String[] coordinates = line.split(",");
 
@@ -233,8 +243,33 @@ public class FileSystemStorageService implements StorageService {
         }
 
         JsonObject template = getSpiderJsonTemplate();
-        System.out.println(ordersArray.get(0));
+        template.addProperty("id", filename);
         template.getAsJsonObject("vrp").add("orders", ordersArray);
         return template.toString();
+    }
+
+    @Override
+    public void writeRouteDataToCsv(RouteDto routeDto, String filename) throws IOException {
+        String destinationFile = this.rootLocation.resolve(
+                Paths.get(filename + "_csv")
+        ).normalize().toAbsolutePath().toString();
+        try (CSVWriter csvWriter = new CSVWriter(new FileWriter(destinationFile))) {
+            // Write header
+            String[] header = {"Vehicle ID", "Type", "Order ID", "Start Time", "Duration"};
+            csvWriter.writeNext(header);
+
+            // Write route and visit data
+            for (RouteDto.Route route : routeDto.getRoutes()) {
+                String vehicleId = route.getVehicleId();
+                for (RouteDto.Visit visit : route.getVisits()) {
+                    String type = visit.getType();
+                    String orderId = visit.getOrderId();
+                    String startTime = visit.getStartTime();
+                    String duration = visit.getDuration();
+                    String[] row = {vehicleId, type, orderId, startTime, duration};
+                    csvWriter.writeNext(row);
+                }
+            }
+        }
     }
 }

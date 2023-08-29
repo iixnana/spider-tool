@@ -1,9 +1,10 @@
 import IUserData from './User';
 
-export default interface ISpiderFileData {
+export default interface ISpiderData {
     id?: number;
     problemFilename: string;
     solutionFilename?: string;
     author: IUserData;
-    createdOn: string;
+    createdOn: Date;
+    lastUpdatedOn: Date;
 }
