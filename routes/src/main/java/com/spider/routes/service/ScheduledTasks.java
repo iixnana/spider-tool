@@ -60,6 +60,11 @@ public class ScheduledTasks {
                     SpiderSessionDto parsedResponseBody = gson.fromJson(response.body(), SpiderSessionDto.class);
                     SpiderSession session = spiderSessionService.createSpiderSession(parsedResponseBody);
                     spiderDataService.updateSpiderDataRowSession(row.getId(), session);
+                    if (session.isReady()) {
+                        // Start optimization if it is ready already
+                        startOptimizationTask(session.getSessionId());
+                        spiderSessionService.updateSpiderSessionAwaitingOptimization(row.getId(), true);
+                    }
                     successfulCounter += 1;
                 } else {
                     logger.warn("Failed to start a session for {}. Response.body(): {}", row.getProblemFilename(), response.body());
