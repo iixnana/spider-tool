@@ -1,6 +1,7 @@
 package com.spider.routes.service;
 
 import com.spider.routes.model.SpiderData;
+import com.spider.routes.model.SpiderSession;
 import com.spider.routes.model.User;
 import com.spider.routes.repository.SpiderDataRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -54,6 +55,18 @@ public class SpiderDataService {
         if (optionalSpiderData.isPresent()) {
             SpiderData spiderData = optionalSpiderData.get();
             spiderData.setSolutionFilename(String.format("%s_solution", spiderData.getFileId()));
+            return spiderDataRepository.save(spiderData);
+        } else {
+            throw new EntityNotFoundException("SpiderData not found with id: " + id);
+        }
+    }
+
+    public SpiderData updateSpiderDataRowSession(Long id, SpiderSession session) {
+        Optional<SpiderData> optionalSpiderData = spiderDataRepository.findById(id);
+
+        if (optionalSpiderData.isPresent()) {
+            SpiderData spiderData = optionalSpiderData.get();
+            spiderData.setSession(session);
             return spiderDataRepository.save(spiderData);
         } else {
             throw new EntityNotFoundException("SpiderData not found with id: " + id);

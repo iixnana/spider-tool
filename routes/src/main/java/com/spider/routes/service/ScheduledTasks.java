@@ -50,7 +50,8 @@ public class ScheduledTasks {
 
                 if (response.statusCode() == HttpStatus.CREATED.value()) {
                     SpiderSessionDto parsedResponseBody = gson.fromJson(response.body(), SpiderSessionDto.class);
-                    spiderSessionService.createSpiderSession(parsedResponseBody);
+                    SpiderSession session = spiderSessionService.createSpiderSession(parsedResponseBody);
+                    spiderDataService.updateSpiderDataRowSession(row.getId(), session);
                     successfulCounter += 1;
                 } else {
                     logger.warn("Failed to start a session for {}. Response.body(): {}", row.getProblemFilename(), response.body());
@@ -58,6 +59,32 @@ public class ScheduledTasks {
                 }
             }
             logger.info("startSessionsTask(): created session for {} rows, failed {} rows", successfulCounter, failedCounter);
+        }
+    }
+
+    @Scheduled(fixedRate = 60000) // 60,000 milliseconds = 1 minute
+    public void updateNewSessionsTask() throws IOException, InterruptedException {
+        logger.info("Running scheduled updateNewSessionsTask.");
+        List<SpiderSession> collectedSpiderSessions = spiderSessionService.getSpiderSessionsNotReady();
+
+        if (!collectedSpiderSessions.isEmpty()) {
+            int successfulCounter = 0;
+            int failedCounter = 0;
+
+            logger.info("updateNewSessionsTask(): checking session for {} rows", collectedSpiderSessions.size());
+            for (SpiderSession row : collectedSpiderSessions) {
+                HttpResponse<String> response = spiderService.getSession(row.getSessionId());
+
+                if (response.statusCode() == HttpStatus.OK.value()) {
+                    SpiderSessionDto parsedResponseBody = gson.fromJson(response.body(), SpiderSessionDto.class);
+                    spiderSessionService.updateSpiderSession(row.getId(), parsedResponseBody);
+                    successfulCounter += 1;
+                } else {
+                    logger.warn("Failed to check on a session for {}. Response.body(): {}", row.getSessionId(), response.body());
+                    failedCounter += 1;
+                }
+            }
+            logger.info("updateNewSessionsTask(): checking session for {} rows, failed {} rows", successfulCounter, failedCounter);
         }
     }
 
@@ -77,7 +104,6 @@ public class ScheduledTasks {
                 if (response.statusCode() == HttpStatus.OK.value()) {
                     response = spiderService.getSession(row.getSessionId());
                     SpiderSessionDto parsedResponseBody = gson.fromJson(response.body(), SpiderSessionDto.class);
-                    spiderSessionService.updateSpiderSession(row.getId(), parsedResponseBody);
                     successfulCounter += 1;
                 } else {
                     logger.warn("Failed to start an optimization for {}. Response.body(): {}", row.getSessionId(), response.body());

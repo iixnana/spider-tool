@@ -16,22 +16,22 @@ public class SpiderSession {
     private String sessionId;
 
     @Column(name = "is_ready")
-    private boolean isReady;
+    private Boolean isReady;
 
     @Column(name = "setup_progress")
     private String setupProgress;
 
     @Column(name = "optimization_is_running")
-    private boolean optimizationIsRunning;
+    private Boolean optimizationIsRunning;
 
     @Column(name = "iteration_count")
-    private int iterationCount;
+    private Integer iterationCount;
 
     @Column(name = "optimization_time")
     private String optimizationTime;
 
     @Column(name = "best_solution_value")
-    private int bestSolutionValue;
+    private Integer bestSolutionValue;
 
     @Column(name = "error_during_setup")
     private String errorDuringSetup;
@@ -39,7 +39,7 @@ public class SpiderSession {
     @Column(name = "internal_optimizer_error")
     private String internalOptimizerError;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "solution_values")
     private List<Integer> solutionValues;
 

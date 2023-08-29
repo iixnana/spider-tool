@@ -108,4 +108,11 @@ public class SpiderData {
         this.lastUpdatedOn = lastUpdatedOn;
     }
 
+    public SpiderSession getSession() {
+        return session;
+    }
+
+    public void setSession(SpiderSession session) {
+        this.session = session;
+    }
 }

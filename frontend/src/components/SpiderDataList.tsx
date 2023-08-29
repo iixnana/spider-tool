@@ -6,7 +6,7 @@ import React from 'react';
 import UploadFile from './UploadFile';
 import moment from 'moment';
 
-export const SpiderDataTable: React.FC = () => {
+export const SpiderDataList: React.FC = () => {
     const { error, data } = useQuery({
         queryKey: 'spiderDataList',
         queryFn: () =>
@@ -43,26 +43,25 @@ export const SpiderDataTable: React.FC = () => {
 
     data.map((row, i) => console.log(row.createdOn));
 
-    // TODO: Fix createdOn format
     return (
         <div>
             <UploadFile />
-            <table>
+            <table className="table">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Created on</th>
-                        <th>Last updated on</th>
-                        <th>Problem filename</th>
-                        <th>Solution filename</th>
-                        <th>Author</th>
+                        <th scope="col">ID</th>
+                        <th scope="col">Created on</th>
+                        <th scope="col">Last updated on</th>
+                        <th scope="col">Problem filename</th>
+                        <th scope="col">Solution filename</th>
+                        <th scope="col">Author</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     {data.map((row, i) => (
                         <tr key={i}>
-                            <td>{row.id}</td>
+                            <th scope="row">{row.id}</th>
                             <td>
                                 {moment(row.createdOn).format(
                                     'YYYY-MM-DD HH:mm:ss'

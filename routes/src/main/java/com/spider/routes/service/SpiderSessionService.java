@@ -27,7 +27,11 @@ public class SpiderSessionService {
     }
 
     public List<SpiderSession> getSpiderSessionsWithoutOptimization() {
-        return spiderSessionRepository.findByAndOptimizationIsRunningIsFalseAndIsReadyIsTrueAndIterationCountIs(0);
+        return spiderSessionRepository.findByIsReadyIsTrueAndIterationCountIs(0);
+    }
+
+    public List<SpiderSession> getSpiderSessionsNotReady() {
+        return spiderSessionRepository.findByIsReadyIsFalse();
     }
 
     public List<SpiderSession> getSpiderSessionsWithRunningOptimization() {
@@ -35,7 +39,7 @@ public class SpiderSessionService {
     }
 
     public List<SpiderSession> getSpiderSessionsWithCompletedOptimization() {
-        return spiderSessionRepository.findByOptimizationIsRunningIsFalseAndBestSolutionValueIsNotNull();
+        return spiderSessionRepository.findByOptimizationIsRunningIsFalseAndIsReadyIsTrueAndBestSolutionValueIsNotNull();
     }
 
     public SpiderSession createSpiderSession(SpiderSessionDto session) {
@@ -59,9 +63,6 @@ public class SpiderSessionService {
         if (optionalSession.isPresent()) {
             SpiderSession spiderSession = optionalSession.get();
 
-            //Save current solution to compare with for progress
-            List<Integer> previousSolutions = spiderSession.getSolutionValues();
-            previousSolutions.add(session.getBestSolutionValue());
 
             spiderSession.setBestSolutionValue(session.getBestSolutionValue());
             spiderSession.setErrorDuringSetup(session.getErrorDuringSetup());
@@ -71,7 +72,13 @@ public class SpiderSessionService {
             spiderSession.setOptimizationIsRunning(session.isOptimizationIsRunning());
             spiderSession.setOptimizationTime(session.getOptimizationTime());
             spiderSession.setSetupProgress(session.getSetupProgress());
-            spiderSession.setSolutionValues(previousSolutions);
+
+            //Save current solution to compare with for progress
+            if (session.getBestSolutionValue() != 0) {
+                List<Integer> previousSolutions = spiderSession.getSolutionValues();
+                previousSolutions.add(session.getBestSolutionValue());
+                spiderSession.setSolutionValues(previousSolutions);
+            }
 
             return spiderSessionRepository.save(spiderSession);
         } else {

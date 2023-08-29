@@ -61,10 +61,33 @@ const UploadFile = () => {
         setFileUploadProgress(false);
     };
 
+    const buttonClassName = `btn ${files.length === 0 && 'btn-primary'} ${
+        files.length > 0 && 'btn-success'
+    } ${files.length > 0 && !fileSize && 'btn-danger'}`;
+
     return (
         <form onSubmit={fileSubmitHandler}>
-            <input type="file" multiple onChange={uploadFileHandler} />
-            <button type="submit">Upload</button>
+            <div className="btn-group" role="group" aria-label="Basic example">
+                <button type="button" className={buttonClassName}>
+                    <label htmlFor="file-upload" className="custom-file-upload">
+                        Choose files
+                    </label>
+                </button>
+
+                <input
+                    id="file-upload"
+                    type="file"
+                    multiple
+                    onChange={uploadFileHandler}
+                />
+                <button
+                    type="submit"
+                    className={buttonClassName}
+                    disabled={files.length === 0}
+                >
+                    Upload
+                </button>
+            </div>
             {!fileSize && <p style={{ color: 'red' }}>File size exceeded!!</p>}
             {fileUploadProgress && (
                 <p style={{ color: 'red' }}>Uploading File(s)</p>

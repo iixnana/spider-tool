@@ -13,6 +13,7 @@ export const UsersList: React.FC = () => {
             })
                 .then((response) => response.json())
                 .then((data) => {
+                    // TODO: Should be done by OpenApi
                     if (
                         Array.isArray(data) &&
                         data.every((row) => typeof row.username === 'string')
@@ -21,6 +22,8 @@ export const UsersList: React.FC = () => {
                             (row) =>
                                 ({
                                     id: row.id,
+                                    firstName: row.firstName,
+                                    lastName: row.lastName,
                                     username: row.username
                                 }) as IUserData
                         );
@@ -32,5 +35,54 @@ export const UsersList: React.FC = () => {
 
     if (error || !data) return <LoadingPage />;
 
-    return <div>{data.map((x: IUserData) => x.username)}</div>;
+    // TODO: create user signup page, user actions
+    return (
+        <div>
+            <button disabled className="btn btn-primary">
+                Create user
+            </button>
+            <table className="table">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Firstname</th>
+                        <th scope="col">Lastname</th>
+                        <th scope="col">Username</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {data.map((row: IUserData, i) => (
+                        <tr key={i}>
+                            <th scope="row">{row.id}</th>
+                            <td>{row.firstName}</td>
+                            <td>{row.lastName}</td>
+                            <td>{row.username}</td>
+                            <td>
+                                <div
+                                    className="btn-group"
+                                    role="group"
+                                    aria-label="Basic example"
+                                >
+                                    <button
+                                        disabled
+                                        className="btn btn-primary"
+                                    >
+                                        Edit user
+                                    </button>
+                                    <button
+                                        disabled
+                                        className="btn btn-primary"
+                                    >
+                                        Delete user
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
 };
