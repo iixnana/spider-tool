@@ -102,7 +102,7 @@ public class RouteDto {
 
     public static class TravelData {
         private String travelTime;
-        private int distance;
+        private double distance;
         private String waitingTime;
 
         public String getTravelTime() {
@@ -113,11 +113,11 @@ public class RouteDto {
             this.travelTime = travelTime;
         }
 
-        public int getDistance() {
+        public double getDistance() {
             return distance;
         }
 
-        public void setDistance(int distance) {
+        public void setDistance(double distance) {
             this.distance = distance;
         }
 
