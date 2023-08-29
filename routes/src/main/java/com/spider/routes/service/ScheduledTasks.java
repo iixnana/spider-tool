@@ -80,7 +80,7 @@ public class ScheduledTasks {
                     SpiderSession updatedSpiderSession = spiderSessionService.updateSpiderSession(row.getId(), parsedResponseBody);
                     if (updatedSpiderSession.isReady()) {
                         startOptimizationTask(row.getSessionId());
-                        spiderSessionService.updateSpiderSessionIsRunningOptimization(row.getId(), true);
+                        spiderSessionService.updateSpiderSessionAwaitingOptimization(row.getId(), true);
                     }
                     successfulCounter += 1;
                 } else {
@@ -119,7 +119,7 @@ public class ScheduledTasks {
                     response = spiderService.getSession(sessionId);
                     SpiderSessionDto parsedResponseBody = gson.fromJson(response.body(), SpiderSessionDto.class);
                     spiderSessionService.updateSpiderSession(rowId, parsedResponseBody);
-                    spiderSessionService.updateSpiderSessionIsRunningOptimization(rowId, false);
+                    spiderSessionService.updateSpiderSessionAwaitingOptimization(rowId, false);
                     logger.info("Successfully stopped optimization for {}", sessionId);
                 } else {
                     logger.info("Failed to stop optimization for {}", sessionId);
@@ -131,6 +131,15 @@ public class ScheduledTasks {
     @Scheduled(fixedRate = 60000)
     public void checkSessionsTask() throws IOException, InterruptedException, InvalidFormatException {
         logger.info("Running scheduled checkSessionsTask.");
+        List<SpiderSession> all = spiderSessionService.getAllSpiderSessions();
+        for (SpiderSession row : all) {
+            System.out.println(row.isReady());
+            System.out.println(row.getSessionId());
+            System.out.println(row.isOptimizationIsRunning());
+            System.out.println(row.getBestSolutionValue());
+            System.out.println(row.getAwaitingOptimization());
+        }
+
         List<SpiderSession> collectedSpiderSessions = spiderSessionService.getSpiderSessionsWithRunningOptimization();
 
         if (!collectedSpiderSessions.isEmpty()) {
@@ -145,10 +154,6 @@ public class ScheduledTasks {
                     SpiderSessionDto parsedResponseBody = gson.fromJson(response.body(), SpiderSessionDto.class);
                     SpiderSession spiderSession = spiderSessionService.updateSpiderSession(row.getId(), parsedResponseBody);
 
-                    System.out.println(row.isReady());
-                    System.out.println(row.getSessionId());
-                    System.out.println(row.isOptimizationIsRunning());
-                    System.out.println(row.getBestSolutionValue());
 
                     // Check if optimization needs to be stopped
                     stopOptimization(row.getSessionId(), row.getId(), spiderSession.getSolutionValues());

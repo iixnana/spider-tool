@@ -85,11 +85,11 @@ public class SpiderSessionService {
         }
     }
 
-    public SpiderSession updateSpiderSessionIsRunningOptimization(Long id, Boolean isRunningOptimization) {
+    public SpiderSession updateSpiderSessionAwaitingOptimization(Long id, Boolean isAwaitingOptimization) {
         Optional<SpiderSession> optionalSession = spiderSessionRepository.findById(id);
         if (optionalSession.isPresent()) {
             SpiderSession spiderSession = optionalSession.get();
-            spiderSession.setOptimizationIsRunning(isRunningOptimization);
+            spiderSession.setAwaitingOptimization(isAwaitingOptimization);
             return spiderSessionRepository.save(spiderSession);
         } else {
             throw new EntityNotFoundException("SpiderSession not found with id: " + id);

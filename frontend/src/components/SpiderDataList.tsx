@@ -1,10 +1,23 @@
-import {useQuery} from 'react-query';
+import { useQuery } from 'react-query';
 import AuthService from '../services/authService';
 import ISpiderData from '../types/SpiderData';
-import {LoadingPage} from './LoadingComponents';
+import { LoadingButton, LoadingPage } from './LoadingComponents';
 import React from 'react';
 import UploadFile from './UploadFile';
 import moment from 'moment';
+
+function downloadBlobAsFile(blob: Blob, fileName: string) {
+    const a = document.createElement('a');
+    a.download = fileName;
+    a.href = window.URL.createObjectURL(blob);
+    const clickEvt = new MouseEvent('click', {
+        view: window,
+        bubbles: true,
+        cancelable: true
+    });
+    a.dispatchEvent(clickEvt);
+    a.remove();
+}
 
 // @ts-ignore
 const downloadFile = ({ data, fileName, fileType }) => {
@@ -38,6 +51,7 @@ function DownloadProblemFile(filename: string) {
         );
 }
 
+// TODO: Replace with actual csv file
 function DownloadSolutionFile(filename: string) {
     var csv = 'test,test2';
 
@@ -46,6 +60,14 @@ function DownloadSolutionFile(filename: string) {
         fileName: `${filename}_solution.csv`,
         fileType: 'text/csv;charset=utf-8'
     });
+}
+
+function DownloadFileFromServer(filename: string) {
+    return fetch(`/api/files/file/${filename}`, {
+        headers: { Authorization: AuthService.getAuthHeader() }
+    })
+        .then((response) => response.blob())
+        .then((blob) => downloadBlobAsFile(blob, filename));
 }
 
 export const SpiderDataList: React.FC = () => {
@@ -113,29 +135,49 @@ export const SpiderDataList: React.FC = () => {
                                 )}
                             </td>
                             <td>
-                                <button
-                                    type="submit"
-                                    className="btn btn-primary"
-                                    onClick={() =>
-                                        DownloadProblemFile(row.problemFilename)
-                                    }
+                                <div
+                                    className="btn-group"
+                                    role="group"
+                                    aria-label="Basic example"
                                 >
-                                    Download problem
-                                </button>
+                                    <button
+                                        type="submit"
+                                        className="btn btn-primary"
+                                        onClick={() =>
+                                            DownloadFileFromServer(
+                                                row.problemFilename
+                                            )
+                                        }
+                                    >
+                                        Original
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="btn btn-primary"
+                                        onClick={() =>
+                                            DownloadProblemFile(
+                                                row.problemFilename
+                                            )
+                                        }
+                                    >
+                                        Spider format
+                                    </button>
+                                </div>
                             </td>
                             <td>
-                                {row.solutionFilename}
-                                <button
-                                    type="submit"
-                                    className="btn btn-primary"
-                                    onClick={() =>
-                                        DownloadSolutionFile(
-                                            row.problemFilename
-                                        )
-                                    }
-                                >
-                                    Download solution
-                                </button>
+                                {(row.solutionFilename && (
+                                    <button
+                                        type="submit"
+                                        className="btn btn-primary"
+                                        onClick={() =>
+                                            DownloadSolutionFile(
+                                                row.problemFilename
+                                            )
+                                        }
+                                    >
+                                        Download solution
+                                    </button>
+                                )) || <LoadingButton />}
                             </td>
                             <td>
                                 {row.author.firstName} {row.author.lastName}

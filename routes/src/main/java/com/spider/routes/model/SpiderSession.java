@@ -162,11 +162,11 @@ public class SpiderSession {
         this.spiderData = spiderData;
     }
 
-    public Boolean getStartedAndAwaitingOptimization() {
+    public Boolean getAwaitingOptimization() {
         return isAwaitingOptimization;
     }
 
-    public void setStartedAndAwaitingOptimization(Boolean startedAndAwaitingOptimization) {
-        isAwaitingOptimization = startedAndAwaitingOptimization;
+    public void setAwaitingOptimization(Boolean awaitingOptimization) {
+        isAwaitingOptimization = awaitingOptimization;
     }
 }
