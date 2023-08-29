@@ -190,7 +190,7 @@ public class ScheduledTasks {
                 if (response.statusCode() == HttpStatus.OK.value()) {
                     // Process data and store as csv
                     RouteDto parsedResponseBody = gson.fromJson(response.body(), RouteDto.class);
-                    storageService.writeRouteDataToCsv(parsedResponseBody, row.getSpiderData().getSolutionFilename());
+                    storageService.writeRouteDataToCsv(parsedResponseBody, row.getSessionId());
                     // Update spider data with solution filename
                     SpiderData spiderData = spiderDataService.updateSpiderDataRowSolution(row.getSpiderData().getId());
                     storageService.storeJsonAsFile(spiderData.getSolutionFilename(), response.body());

@@ -251,7 +251,7 @@ public class FileSystemStorageService implements StorageService {
     @Override
     public void writeRouteDataToCsv(RouteDto routeDto, String filename) throws IOException {
         String destinationFile = this.rootLocation.resolve(
-                Paths.get(filename + "_csv")
+                Paths.get(filename + "_solution_csv")
         ).normalize().toAbsolutePath().toString();
         try (CSVWriter csvWriter = new CSVWriter(new FileWriter(destinationFile))) {
             // Write header
